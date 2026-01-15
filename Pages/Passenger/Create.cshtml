@@ -1,0 +1,57 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Passenger.CreateModel
+@{
+    ViewData["Title"] = "Adaugă Pasager";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-user-plus"></i> Înregistrare Pasager</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Passenger.LastName" class="form-label fw-bold">Nume (Familie)</label>
+                            <input asp-for="Passenger.LastName" class="form-control" />
+                            <span asp-validation-for="Passenger.LastName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Passenger.FirstName" class="form-label fw-bold">Prenume</label>
+                            <input asp-for="Passenger.FirstName" class="form-control" />
+                            <span asp-validation-for="Passenger.FirstName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Passenger.Email" class="form-label fw-bold"><i class="fa-solid fa-envelope"></i> Email</label>
+                        <input asp-for="Passenger.Email" class="form-control" placeholder="nume@exemplu.com" />
+                        <span asp-validation-for="Passenger.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Passenger.PassportNumber" class="form-label fw-bold"><i class="fa-solid fa-passport"></i> Număr Pașaport / CI</label>
+                        <input asp-for="Passenger.PassportNumber" class="form-control" />
+                        <span asp-validation-for="Passenger.PassportNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <input type="submit" value="Adaugă Pasager" class="btn btn-primary btn-lg" />
+                        <a asp-page="Index" class="btn btn-outline-secondary">Înapoi la listă</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

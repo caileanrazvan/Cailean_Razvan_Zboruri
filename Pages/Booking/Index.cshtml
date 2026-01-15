@@ -1,0 +1,85 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Booking.IndexModel
+@{
+    ViewData["Title"] = "Rezervări";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="fa-solid fa-calendar-check text-primary"></i> Rezervări Active</h1>
+    <a asp-page="Create" class="btn btn-success shadow-sm"><i class="fa-solid fa-plus"></i> Rezervare Nouă</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="bg-light text-uppercase small fw-bold">
+                    <tr>
+                        <th>Pasager</th>
+                        <th>Zbor & Loc</th>
+                        <th>Facilități Alese</th>
+                        <th>Total Plată</th>
+                        <th class="text-end" style="min-width: 150px;">Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Booking)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle p-2 me-2 text-primary">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">@item.Passenger.FullName</div>
+                                        <div class="text-muted small">@item.Passenger.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="mb-1"><span class="badge bg-dark">@item.Flight.FlightNumber</span></div>
+                                <span class="badge bg-secondary">Loc: @item.SeatNumber</span>
+                            </td>
+
+                            <td>
+                                @if (item.BookingAmenities != null && item.BookingAmenities.Any())
+                                {
+                                    foreach (var bookingAmenity in item.BookingAmenities)
+                                    {
+                                        <span class="badge bg-info text-dark mb-1">
+                                            <i class="fa-solid fa-check"></i> @bookingAmenity.Amenity.Name
+                                        </span>
+                                        <br />
+         }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fs-6">Standard (Fără extra)</span>
+                                }
+                            </td>
+
+                            <td>
+                                @{
+                                    decimal amenitiesCost = item.BookingAmenities.Sum(ba => ba.Amenity.Price);
+                                    decimal totalCost = item.Flight.BasePrice + amenitiesCost;
+                                }
+                                <span class="text-success fw-bold">@totalCost €</span>
+                                <div class="text-muted" style="font-size: 0.75rem;">
+                                    (Bilet: @item.Flight.BasePrice + Extra: @amenitiesCost)
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group" role="group">
+                                    <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-circle-info"></i></a>
+                                    <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></a>
+                                    <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

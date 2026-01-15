@@ -1,0 +1,50 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Airport.CreateModel
+@{
+    ViewData["Title"] = "Adaugă Aeroport";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-location-dot"></i> Aeroport Nou</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Airport.IataCode" class="form-label fw-bold">Cod IATA (3 Litere)</label>
+                        <input asp-for="Airport.IataCode" class="form-control text-uppercase" placeholder="Ex: OTP" maxlength="3" />
+                        <span asp-validation-for="Airport.IataCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Airport.City" class="form-label fw-bold">Oraș</label>
+                        <input asp-for="Airport.City" class="form-control" />
+                        <span asp-validation-for="Airport.City" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Airport.Country" class="form-label fw-bold">Țară</label>
+                        <input asp-for="Airport.Country" class="form-control" />
+                        <span asp-validation-for="Airport.Country" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <input type="submit" value="Salvează" class="btn btn-primary" />
+                        <a asp-page="Index" class="btn btn-secondary">Anulează</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

@@ -1,0 +1,46 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Airport.IndexModel
+@{
+    ViewData["Title"] = "Aeroporturi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="fa-solid fa-location-dot text-primary"></i> Aeroporturi</h1>
+    <a asp-page="Create" class="btn btn-success shadow-sm"><i class="fa-solid fa-plus"></i> Adaugă</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="bg-light text-uppercase small fw-bold">
+                <tr>
+                    <th>Cod IATA</th>
+                    <th>Oraș</th>
+                    <th>Țară</th>
+                    <th class="text-end" style="min-width: 150px;">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Airport)
+                {
+                    <tr>
+                        <td>
+                            <span class="badge bg-primary fs-6" style="width: 60px;">
+                                @Html.DisplayFor(modelItem => item.IataCode)
+                            </span>
+                        </td>
+                        <td class="fw-bold">@Html.DisplayFor(modelItem => item.City)</td>
+                        <td class="text-muted">@Html.DisplayFor(modelItem => item.Country)</td>
+                        <td class="text-end">
+                            <div class="btn-group" role="group">
+                                <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-circle-info"></i></a>
+                                <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></a>
+                                <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

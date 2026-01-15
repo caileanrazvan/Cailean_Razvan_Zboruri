@@ -1,0 +1,47 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Amenity.CreateModel
+
+@{
+    ViewData["Title"] = "Adaugă Facilitate";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-bell-concierge"></i> Adaugă Facilitate</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Amenity.Name" class="form-label fw-bold">Denumire Serviciu</label>
+                        <input asp-for="Amenity.Name" class="form-control" placeholder="Ex: Bagaj Extra, Priority Boarding" />
+                        <span asp-validation-for="Amenity.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Amenity.Price" class="form-label fw-bold">Preț</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input asp-for="Amenity.Price" class="form-control" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Amenity.Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <input type="submit" value="Salvează Facilitatea" class="btn btn-primary btn-lg" />
+                        <a asp-page="Index" class="btn btn-outline-secondary">Înapoi la listă</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

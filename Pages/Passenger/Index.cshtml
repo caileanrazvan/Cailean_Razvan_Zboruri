@@ -1,0 +1,52 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Passenger.IndexModel
+@{
+    ViewData["Title"] = "Pasageri";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="fa-solid fa-users text-primary"></i> Lista Pasageri</h1>
+    <a asp-page="Create" class="btn btn-success shadow-sm"><i class="fa-solid fa-user-plus"></i> Pasager Nou</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped align-middle mb-0">
+            <thead class="bg-light text-uppercase small fw-bold">
+                <tr>
+                    <th>Nume Complet</th>
+                    <th>Email</th>
+                    <th>Document (Pașaport/CI)</th>
+                    <th class="text-end" style="min-width: 150px;">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Passenger)
+                {
+                    <tr>
+                        <td class="fw-bold">
+                            @Html.DisplayFor(modelItem => item.FullName)
+                        </td>
+                        <td>
+                            <a href="mailto:@item.Email" class="text-decoration-none text-muted">
+                                <i class="fa-regular fa-envelope"></i> @item.Email
+                            </a>
+                        </td>
+                        <td>
+                            <span class="font-monospace text-dark bg-light px-2 py-1 rounded border">
+                                <i class="fa-solid fa-passport text-primary"></i> @item.PassportNumber
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group" role="group">
+                                <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-circle-info"></i></a>
+                                <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></a>
+                                <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
