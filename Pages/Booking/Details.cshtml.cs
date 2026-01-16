@@ -23,24 +23,16 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var booking = await _context.Booking
-                .Include(b => b.Flight)    
-                .Include(b => b.Passenger)  
+            Booking = await _context.Booking
+                .Include(b => b.Flight)        
+                .Include(b => b.Passenger)     
+                .Include(b => b.BookingAmenities) 
+                    .ThenInclude(ba => ba.Amenity)
                 .FirstOrDefaultAsync(m => m.ID == id);
 
-            if (booking == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                Booking = booking;
-            }
+            if (Booking == null) return NotFound();
             return Page();
         }
     }

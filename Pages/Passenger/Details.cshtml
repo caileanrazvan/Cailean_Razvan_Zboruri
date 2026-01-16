@@ -1,43 +1,32 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Passenger.DetailsModel
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalii Pasager";
 }
 
-<h1>Details</h1>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-id-card"></i> Profil Pasager</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Nume Complet</dt>
+                    <dd class="col-sm-8 fw-bold">@Model.Passenger.FullName</dd>
 
-<div>
-    <h4>Passenger</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Passenger.FirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Passenger.FirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Passenger.LastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Passenger.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Passenger.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Passenger.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Passenger.PassportNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Passenger.PassportNumber)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Passenger.ID">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8"><a href="mailto:@Model.Passenger.Email">@Model.Passenger.Email</a></dd>
+
+                    <dt class="col-sm-4">Pașaport</dt>
+                    <dd class="col-sm-8 font-monospace">@Model.Passenger.PassportNumber</dd>
+                </dl>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Edit" asp-route-id="@Model.Passenger.ID" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Editează</a>
+                    <a asp-page="./Index" class="btn btn-secondary">Înapoi</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
