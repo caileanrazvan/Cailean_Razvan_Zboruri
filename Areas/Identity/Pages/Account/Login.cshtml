@@ -1,0 +1,54 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Autentificare AngelAirlines";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h2 class="mb-0"><i class="fa-solid fa-plane-up"></i></h2>
+                <h4 class="fw-bold">AngelAirlines</h4>
+                <p class="small mb-0">Bun venit la bord! Autentifică-te pentru a continua.</p>
+            </div>
+            <div class="card-body p-4">
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.UserNameOrEmail" class="form-control" autocomplete="username" placeholder="numele_tău sau email@domeniu.com" />
+                        <label asp-for="Input.UserNameOrEmail"><i class="fa-solid fa-user me-2"></i>Email sau Nume de Utilizator</label>
+                        <span asp-validation-for="Input.UserNameOrEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="password" />
+                        <label asp-for="Input.Password"><i class="fa-solid fa-lock me-2"></i>Parolă</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="checkbox mb-3">
+                        <label asp-for="Input.RememberMe" class="form-label">
+                            <input class="form-check-input" asp-for="Input.RememberMe" />
+                            Ține-mă minte
+                        </label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button id="login-submit" type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                            Conectare
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-center py-3">
+                <p class="mb-0 small">Nu ai cont? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary fw-bold">Înregistrează-te aici</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

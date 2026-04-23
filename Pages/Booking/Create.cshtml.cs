@@ -1,53 +1,98 @@
-﻿using Cailean_Razvan_Zboruri.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Cailean_Razvan_Zboruri.Data;
-
+using Cailean_Razvan_Zboruri.Models;
 
 namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
-    public class CreateModel : BookingAmenitiesPageModel
+    public class CreateModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
 
-        public CreateModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public CreateModel(AviationContext context)
         {
             _context = context;
         }
 
-        public IActionResult OnGet()
+        // Proprietăți pentru a afișa datele pe pagină
+        public Models.Flight SelectedFlight { get; set; }
+        public IList<Models.Amenity> AvailableAmenities { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PassengersCount { get; set; } = 1;
+
+        // Modelul pe care îl vom salva în baza de date
+        [BindProperty]
+        public Models.Booking Booking { get; set; } = default!;
+
+        // Array pentru a prinde ID-urile serviciilor bifate de utilizator
+        [BindProperty]
+        public int[] SelectedAmenities { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int? flightId, int passengers = 1)
         {
-            ViewData["PassengerID"] = new SelectList(_context.Passenger, "ID", "FullName");
-            ViewData["FlightID"] = new SelectList(_context.Flight, "ID", "FlightNumber");
+            if (flightId == null)
+            {
+                return RedirectToPage("/Flights/Index"); // Dacă nu are zbor, îl trimitem înapoi
+            }
 
-            var booking = new Cailean_Razvan_Zboruri.Models.Booking();
-            booking.BookingAmenities = new List<BookingAmenity>();
+            // Aducem zborul selectat cu tot cu aeroporturi
+            SelectedFlight = await _context.Flight
+                .Include(f => f.DepartureAirport)
+                .Include(f => f.ArrivalAirport)
+                .FirstOrDefaultAsync(m => m.ID == flightId);
 
-            PopulateAssignedAmenityData(_context, booking);
+            if (SelectedFlight == null)
+            {
+                return NotFound();
+            }
+
+            PassengersCount = passengers;
+            AvailableAmenities = await _context.Amenity.ToListAsync();
 
             return Page();
         }
 
         [BindProperty]
-        public Cailean_Razvan_Zboruri.Models.Booking Booking { get; set; } = default!;
+        public List<Passenger> PassengerInputs { get; set; } // Aceasta va prinde datele din formular
 
-        public async Task<IActionResult> OnPostAsync(string[] selectedAmenities)
+        [BindProperty]
+        public string ContactEmail { get; set; }
+
+        [BindProperty]
+        public string ContactPhone { get; set; }
+
+        public async Task<IActionResult> OnPostAsync()
         {
-            if (selectedAmenities != null)
+            // 1. Creăm obiectul principal de rezervare
+            var newBooking = new Models.Booking
             {
-                Booking.BookingAmenities = new List<BookingAmenity>();
+                FlightID = Booking.FlightID,
+                ContactEmail = ContactEmail,
+                ContactPhone = ContactPhone,
+                BookingDate = DateTime.Now
+            };
 
-                foreach (var amenity in selectedAmenities)
+            // 2. Adăugăm fiecare pasager din formular în lista rezervării
+            foreach (var p in PassengerInputs)
+            {
+                newBooking.Passengers.Add(new Passenger
                 {
-                    var amenityToAdd = new BookingAmenity
-                    {
-                        AmenityID = int.Parse(amenity)
-                    };
-                    Booking.BookingAmenities.Add(amenityToAdd);
-                }
+                    Title = p.Title,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    DateOfBirth = p.DateOfBirth,
+                    // Primul pasager primește email-ul de contact
+                    Email = (newBooking.Passengers.Count == 0) ? ContactEmail : null
+                });
             }
 
-            _context.Booking.Add(Booking);
+            _context.Booking.Add(newBooking);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -1,60 +1,92 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Booking.EditModel
-@{
-    ViewData["Title"] = "Editează Rezervarea";
-}
+@{ ViewData["Title"] = "Modifică Rezervare"; }
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fa-solid fa-calendar-check"></i> Creează Rezervare</h4>
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fa-solid fa-pen-to-square"></i> Editează Rezervare</h4>
             </div>
             <div class="card-body">
                 <form method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <input type="hidden" asp-for="Booking.ID" />
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Booking.PassengerID" class="form-label fw-bold">Pasager</label>
-                            <select asp-for="Booking.PassengerID" class="form-select" asp-items="ViewBag.PassengerID"></select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Booking.FlightID" class="form-label fw-bold">Zbor</label>
+                    <h5 class="text-warning mb-3 border-bottom pb-2"><i class="fa-solid fa-plane"></i> 1. Detalii Zbor</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="Booking.FlightID" class="form-label fw-bold">Selectează Zborul</label>
                             <select asp-for="Booking.FlightID" class="form-select" asp-items="ViewBag.FlightID"></select>
+                            <span asp-validation-for="Booking.FlightID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Booking.BookingDate" class="form-label fw-bold">Data Tranzacției</label>
+                            <input asp-for="Booking.BookingDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Booking.BookingDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Booking.SeatNumber" class="form-label fw-bold">Număr Loc</label>
+                            <input asp-for="Booking.SeatNumber" class="form-control" />
+                            <span asp-validation-for="Booking.SeatNumber" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Booking.SeatNumber" class="form-label">Loc</label>
-                        <input asp-for="Booking.SeatNumber" class="form-control" placeholder="Ex: 12A" />
-                        <span asp-validation-for="Booking.SeatNumber" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3 p-3 bg-light rounded border">
-                        <label class="form-label fw-bold mb-3">Servicii Extra:</label>
-                        <div class="row">
-                            @{
-                                int cnt = 0;
-                                foreach (var amenity in Model.AssignedAmenityDataList)
-                                {
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="selectedAmenities" value="@amenity.AmenityID" @(Html.Raw(amenity.Assigned ? "checked=\"checked\"" : "")) />
-                                            <label class="form-check-label">@amenity.Name</label>
-                                        </div>
-                                    </div>
-                                }
-                            }
+                    <h5 class="text-warning mb-3 border-bottom pb-2"><i class="fa-solid fa-address-book"></i> 2. Date Contact Rezervare</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="Booking.ContactEmail" class="form-label fw-bold">Email Contact</label>
+                            <input asp-for="Booking.ContactEmail" class="form-control" placeholder="adresa@email.com" />
+                            <span asp-validation-for="Booking.ContactEmail" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Booking.ContactPhone" class="form-label fw-bold">Telefon Contact</label>
+                            <input asp-for="Booking.ContactPhone" class="form-control" placeholder="+40..." />
+                            <span asp-validation-for="Booking.ContactPhone" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <input type="submit" value="Salvează Rezervarea" class="btn btn-primary btn-lg" />
-                        <a asp-page="Index" class="btn btn-secondary">Înapoi la listă</a>
+                    <h5 class="text-warning mb-3 border-bottom pb-2"><i class="fa-solid fa-bell-concierge"></i> 3. Servicii Extra</h5>
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tr>
+                                    @{
+                                        int cnt = 0;
+                                        foreach (var amenity in Model.AssignedAmenityDataList)
+                                        {
+                                            if (cnt++ % 3 == 0)
+                                            {
+                                                @:</tr><tr>
+                                            }
+                                            @:<td>
+                                                <div class="form-check">
+                                                    <input type="checkbox"
+                                                           class="form-check-input"
+                                                           name="selectedAmenities"
+                                                           value="@amenity.AmenityID"
+                                                           @(Html.Raw(amenity.Assigned ? "checked=\"checked\"" : "")) />
+                                                    <label class="form-check-label">@amenity.Name</label>
+                                                </div>
+                                            @:</td>
+                                        }
+                                    }
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-page="./Index" class="btn btn-secondary me-md-2">Anulează</a>
+                        <input type="submit" value="Salvează Modificările" class="btn btn-warning px-4 fw-bold" />
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

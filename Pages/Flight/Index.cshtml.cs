@@ -8,33 +8,60 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
 {
     public class IndexModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
 
-        public IndexModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public IndexModel(AviationContext context)
         {
             _context = context;
         }
 
-        public IList<Cailean_Razvan_Zboruri.Models.Flight> Flight { get; set; } = default!;
+        public IList<Models.Flight> Flight { get; set; } = default!;
 
-        public string CurrentFilter { get; set; }
+        // Proprietăți ajutătoare pentru interfață
+        public string DepartureCityName { get; set; } = "Oriunde";
+        public string ArrivalCityName { get; set; } = "Oriunde";
+        public DateTime? SearchDate { get; set; }
+        public int Passengers { get; set; }
 
-        public async Task OnGetAsync(string searchString)
+        public async Task OnGetAsync(int? departureId, int? arrivalId, DateTime? flightDate, int passengers = 1)
         {
-            CurrentFilter = searchString;
+            // Salvăm datele pentru a le afișa în header-ul paginii de rezultate
+            SearchDate = flightDate;
+            Passengers = passengers < 1 ? 1 : passengers;
 
-            var query = _context.Flight
-                .Include(f => f.DepartureAirport)
+            // 1. Definim interogarea de bază (Aducem toate zborurile)
+            IQueryable<Models.Flight> query = _context.Flight
                 .Include(f => f.ArrivalAirport)
-                .AsQueryable();
+                .Include(f => f.DepartureAirport);
 
-            if (!string.IsNullOrEmpty(searchString))
+            // 2. Aplicăm filtrul pentru PLECARE doar dacă s-a selectat un oraș
+            if (departureId.HasValue)
             {
-                query = query.Where(s => s.ArrivalAirport.City.Contains(searchString)
-                                      || s.FlightNumber.Contains(searchString));
+                query = query.Where(f => f.DepartureAirport.ID == departureId.Value);
+
+                // Căutăm numele pentru design
+                var depAirport = await _context.Airport.FindAsync(departureId.Value);
+                if (depAirport != null) DepartureCityName = depAirport.City;
             }
 
-            Flight = await query.ToListAsync();
+            // 3. Aplicăm filtrul pentru SOSIRE doar dacă s-a selectat un oraș
+            if (arrivalId.HasValue)
+            {
+                query = query.Where(f => f.ArrivalAirport.ID == arrivalId.Value);
+
+                // Căutăm numele pentru design
+                var arrAirport = await _context.Airport.FindAsync(arrivalId.Value);
+                if (arrAirport != null) ArrivalCityName = arrAirport.City;
+            }
+
+            // 4. Aplicăm filtrul pentru DATĂ doar dacă a fost aleasă una
+            if (flightDate.HasValue)
+            {
+                query = query.Where(f => f.DepartureTime.Date == flightDate.Value.Date);
+            }
+
+            // 5. La final, extragem rezultatele filtrate din baza de date
+            Flight = await query.OrderBy(f => f.DepartureTime).ToListAsync();
         }
     }
 }

@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cailean_Razvan_Zboruri.Pages.Amenity
 {
+    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;

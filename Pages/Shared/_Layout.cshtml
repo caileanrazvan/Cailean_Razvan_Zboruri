@@ -11,37 +11,80 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">AngelAirlines</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Flight/Index">Zboruri</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Passenger/Index">Pasageri</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Booking/Index">Rezervări</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Administrare
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-page="/Airport/Index">Aeroporturi</a></li>
-                                <li><a class="dropdown-item" asp-page="/Amenity/Index">Facilități (Amenities)</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3 shadow-lg"
+                 style="background: linear-gradient(90deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);">
+                <div class="container">
+
+                        <a class="navbar-brand d-flex align-items-center fw-bold fs-4 px-3 py-1 rounded-pill bg-white bg-opacity-10 shadow-sm me-4"
+                           asp-area="" asp-page="/Index" style="letter-spacing: 1px;">
+
+                            <img src="~/images/logo.svg" alt="AngelAirlines Logo" width="35" height="35" class="me-2" />
+
+                            Angel Airlines
+                        </a>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1 align-items-center">
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-white fw-bold px-3 nav-hover" asp-area="" asp-page="/Flight/Index">
+                                    <i class="fa-solid fa-plane-departure me-2 text-warning"></i>Zboruri
+                                </a>
+                            </li>
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-white fw-bold px-3 nav-hover" asp-area="" asp-page="/Booking/Index">
+                                    <i class="fa-solid fa-ticket-simple me-2 text-warning"></i>Rezervări
+                                </a>
+                            </li>
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-white-50 fw-semibold px-3" href="#">
+                                    <i class="fa-solid fa-passport me-2"></i>Check-in
+                                </a>
+                            </li>
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-white-50 fw-semibold px-3" href="#">
+                                    <i class="fa-solid fa-headset me-2"></i>Contact
+                                </a>
+                            </li>
+
+                            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item mx-2 d-none d-sm-block">
+                                    <div class="vr text-white h-100" style="opacity: 0.3;"></div>
+                                </li>
+
+                                <li class="nav-item dropdown me-2">
+                                    <a class="nav-link dropdown-toggle text-white fw-bold px-3 nav-hover" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-user-shield me-2 text-danger"></i>Administrare
+                                    </a>
+                                    <ul class="dropdown-menu shadow-lg border-0 mt-2" aria-labelledby="adminDropdown" style="border-radius: 12px; min-width: 200px;">
+                                        <li>
+                                            <h6 class="dropdown-header text-primary fw-bold text-uppercase small"><i class="fa-solid fa-database me-1"></i> Baze de date</h6>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item fw-semibold py-2 dropdown-hover" asp-area="" asp-page="/Airport/Index">
+                                                <i class="fa-solid fa-map-location-dot me-2 text-muted"></i> Aeroporturi
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item fw-semibold py-2 dropdown-hover" asp-area="" asp-page="/Amenity/Index">
+                                                <i class="fa-solid fa-bell-concierge me-2 text-muted"></i> Servicii (Amenities)
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </header>
     </header>
     <div class="container">
         <main role="main" class="pb-3">

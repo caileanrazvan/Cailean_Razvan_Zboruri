@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cailean_Razvan_Zboruri.Models
 {
@@ -17,7 +18,10 @@ namespace Cailean_Razvan_Zboruri.Models
 
         public string Country { get; set; }
 
+        [InverseProperty("DepartureAirport")]
         public ICollection<Flight>? Departures { get; set; }
+
+        [InverseProperty("ArrivalAirport")]
         public ICollection<Flight>? Arrivals { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
+using System.Security.Claims;
 
 namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
@@ -23,15 +24,24 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
         public async Task OnGetAsync()
         {
-            if (_context.Booking != null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("Admin");
+
+            // Construim interogarea de bază
+            var bookingsQuery = _context.Booking
+                .Include(b => b.Flight)
+                .Include(b => b.Passengers)
+                .Include(b => b.BookingAmenities)
+                    .ThenInclude(ba => ba.Amenity)
+                .AsQueryable();
+
+            // FILTRARE: Dacă NU este admin, vedem doar rezervările unde UserId coincide cu cel logat
+            if (!isAdmin)
             {
-                Booking = await _context.Booking
-                    .Include(b => b.Passenger)    
-                    .Include(b => b.Flight)        
-                    .Include(b => b.BookingAmenities) 
-                        .ThenInclude(ba => ba.Amenity) 
-                    .ToListAsync();
+                bookingsQuery = bookingsQuery.Where(b => b.UserId == userId);
             }
+
+            Booking = await bookingsQuery.ToListAsync();
         }
     }
 }

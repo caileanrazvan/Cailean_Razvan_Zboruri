@@ -1,59 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
+using System.Security.Claims;
 
 namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
     public class DeleteModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
-
-        public DeleteModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
-        {
-            _context = context;
-        }
+        private readonly AviationContext _context;
+        public DeleteModel(AviationContext context) { _context = context; }
 
         [BindProperty]
-        public Cailean_Razvan_Zboruri.Models.Booking Booking { get; set; } = default!;
+        public Models.Booking Booking { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var booking = await _context.Booking.FirstOrDefaultAsync(m => m.ID == id);
+            Booking = await _context.Booking
+                .Include(b => b.Passengers)
+                .Include(b => b.Flight)
+                .FirstOrDefaultAsync(m => m.ID == id);
 
-            if (booking == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                Booking = booking;
-            }
+            if (Booking == null) return NotFound();
+
+            // Verificare Securitate
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (Booking.UserId != userId && !User.IsInRole("Admin")) return Forbid();
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var booking = await _context.Booking.FindAsync(id);
-            if (booking != null)
+            var bookingToDelete = await _context.Booking.FindAsync(id);
+
+            if (bookingToDelete != null)
             {
-                Booking = booking;
-                _context.Booking.Remove(Booking);
+                // Verificare Securitate la nivel de POST
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (bookingToDelete.UserId != userId && !User.IsInRole("Admin")) return Forbid();
+
+                _context.Booking.Remove(bookingToDelete);
                 await _context.SaveChangesAsync();
             }
 

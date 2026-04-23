@@ -1,0 +1,43 @@
+﻿@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Gestionare Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fa-solid fa-envelope-circle-check"></i> Securitate Email</h5>
+    </div>
+    <div class="card-body p-4">
+        <partial name="_StatusMessage" for="StatusMessage" />
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+            <div class="form-floating mb-3 input-group">
+                <input asp-for="Email" class="form-control" placeholder="Email actual" disabled />
+                <label asp-for="Email">Email Actual</label>
+                @if (Model.IsEmailConfirmed)
+                {
+                    <span class="input-group-text text-success fw-bold border-0 bg-transparent">
+                        <i class="fa-solid fa-check-double me-1"></i> Confirmat
+                    </span>
+                }
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Introdu noul email" />
+                <label asp-for="Input.NewEmail">Adresă Email Nouă</label>
+                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+            </div>
+
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-info text-white fw-bold px-4 shadow-sm">
+                Actualizează Email
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -8,7 +8,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fa-solid fa-ticket"></i> Detalii Rezervare</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-ticket"></i> Fișa Rezervării</h4>
             </div>
             <div class="card-body">
 
@@ -21,42 +21,44 @@
                 </div>
 
                 <dl class="row">
-                    <dt class="col-sm-4">Pasager</dt>
-                    <dd class="col-sm-8 fw-bold">
-                        <i class="fa-solid fa-user text-muted"></i> @Model.Booking.Passenger.FullName
+                    <hr class="my-3" />
+
+                    <dt class="col-sm-4 text-muted">Data Emiterii Biletului</dt>
+                    <dd class="col-sm-8">
+                        <i class="fa-regular fa-calendar"></i> @Model.Booking.BookingDate.ToString("dd MMMM yyyy, HH:mm")
                     </dd>
 
-                    <dt class="col-sm-4">Facilități Extra</dt>
+                    <dt class="col-sm-4 text-muted">Facilități Extra Selectate</dt>
                     <dd class="col-sm-8">
                         @if (Model.Booking.BookingAmenities != null && Model.Booking.BookingAmenities.Any())
                         {
                             foreach (var item in Model.Booking.BookingAmenities)
                             {
-                                <span class="badge bg-info text-dark me-1 mb-1">
+                                <span class="badge bg-info text-dark me-1 mb-1 shadow-sm">
                                     <i class="fa-solid fa-check"></i> @item.Amenity.Name (@item.Amenity.Price €)
                                 </span>
                             }
                         }
                         else
                         {
-                            <span class="text-muted">Nicio facilitate extra.</span>
+                            <span class="text-muted fst-italic">Bilet standard (fără servicii adiționale).</span>
                         }
                     </dd>
 
-                    <dt class="col-sm-4 mt-3 pt-3 border-top">Total de Plată</dt>
+                    <dt class="col-sm-4 mt-3 pt-3 border-top text-uppercase fw-bold">Total de Plată</dt>
                     <dd class="col-sm-8 mt-3 pt-3 border-top">
                         @{
-                            decimal amenitiesSum = Model.Booking.BookingAmenities.Sum(x => x.Amenity.Price);
+                            decimal amenitiesSum = Model.Booking.BookingAmenities?.Sum(x => x.Amenity?.Price ?? 0) ?? 0;
                             decimal total = Model.Booking.Flight.BasePrice + amenitiesSum;
                         }
                         <h3 class="text-success fw-bold m-0">@total €</h3>
-                        <small class="text-muted">(Bilet: @Model.Booking.Flight.BasePrice € + Extra: @amenitiesSum €)</small>
+                        <small class="text-muted">(Tarif Bază: @Model.Booking.Flight.BasePrice € + Cost Extra: @amenitiesSum €)</small>
                     </dd>
                 </dl>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a asp-page="./Edit" asp-route-id="@Model.Booking.ID" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Editează</a>
-                    <a asp-page="./Index" class="btn btn-secondary">Înapoi</a>
+                    <a asp-page="./Edit" asp-route-id="@Model.Booking.ID" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Editează Datele</a>
+                    <a asp-page="./Index" class="btn btn-secondary">Înapoi la Listă</a>
                 </div>
             </div>
         </div>

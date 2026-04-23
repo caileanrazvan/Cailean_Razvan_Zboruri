@@ -1,37 +1,42 @@
-﻿using Cailean_Razvan_Zboruri.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Cailean_Razvan_Zboruri.Models;
 
 namespace Cailean_Razvan_Zboruri.Data
 {
-    public class AviationContext : DbContext
+    public class AviationContext : IdentityDbContext<IdentityUser>
     {
         public AviationContext(DbContextOptions<AviationContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Airport> Airport { get; set; }
-        public DbSet<Flight> Flight { get; set; }
-        public DbSet<Passenger> Passenger { get; set; }
-        public DbSet<Booking> Booking { get; set; }
-        public DbSet<Amenity> Amenity { get; set; }
-        public DbSet<BookingAmenity> BookingAmenity { get; set; } 
+        public DbSet<Cailean_Razvan_Zboruri.Models.Flight> Flight { get; set; } = default!;
+        public DbSet<Cailean_Razvan_Zboruri.Models.Passenger> Passenger { get; set; } = default!;
+        public DbSet<Cailean_Razvan_Zboruri.Models.Airport> Airport { get; set; } = default!;
+        public DbSet<Cailean_Razvan_Zboruri.Models.Amenity> Amenity { get; set; } = default!;
+        public DbSet<Cailean_Razvan_Zboruri.Models.Booking> Booking { get; set; } = default!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        // ADAUGA ACEASTA METODA:
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.Entity<Flight>()
+            // IMPORTANT: Prima linie trebuie sa fie asta cand folosim Identity!
+            base.OnModelCreating(builder);
+
+            // 1. Configuram relatia pentru Aeroportul de Plecare (Fara stergere in cascada)
+            builder.Entity<Flight>()
                 .HasOne(f => f.DepartureAirport)
-                .WithMany(a => a.Departures) 
+                .WithMany(a => a.Departures)
                 .HasForeignKey(f => f.DepartureAirportID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Flight>()
+            // 2. Configuram relatia pentru Aeroportul de Sosire (Fara stergere in cascada)
+            builder.Entity<Flight>()
                 .HasOne(f => f.ArrivalAirport)
                 .WithMany(a => a.Arrivals)
                 .HasForeignKey(f => f.ArrivalAirportID)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            base.OnModelCreating(modelBuilder);
         }
     }
 }

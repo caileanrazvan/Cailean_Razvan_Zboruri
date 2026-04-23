@@ -9,6 +9,8 @@ namespace Cailean_Razvan_Zboruri.Models
 
         [Column(TypeName = "decimal(6, 2)")]
         public decimal Price { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Description { get; set; }
 
         public ICollection<BookingAmenity>? BookingAmenities { get; set; }
     }

@@ -1,60 +1,188 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Booking.CreateModel
 @{
-    ViewData["Title"] = "Rezervare Nouă";
+    ViewData["Title"] = "Finalizare Rezervare";
+    // Calculăm prețul de bază pentru a-l afișa în sumar
+    var baseTotal = Model.SelectedFlight.BasePrice * Model.PassengersCount;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fa-solid fa-calendar-check"></i> Creează Rezervare</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container mt-4 mb-5">
+    <div class="d-flex align-items-center mb-4">
+        <a asp-page="/Flights/Index" class="btn btn-outline-secondary rounded-circle me-3"><i class="fa-solid fa-arrow-left"></i></a>
+        <h2 class="fw-bold mb-0 text-primary">Finalizare Rezervare</h2>
+    </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Booking.PassengerID" class="form-label fw-bold">Pasager</label>
-                            <select asp-for="Booking.PassengerID" class="form-select" asp-items="ViewBag.PassengerID"></select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Booking.FlightID" class="form-label fw-bold">Zbor</label>
-                            <select asp-for="Booking.FlightID" class="form-select" asp-items="ViewBag.FlightID"></select>
-                        </div>
-                    </div>
+    <form method="post">
+        <input type="hidden" asp-for="Booking.FlightID" value="@Model.SelectedFlight.ID" />
+        <input type="hidden" name="PassengersCount" value="@Model.PassengersCount" />
 
-                    <div class="mb-3">
-                        <label asp-for="Booking.SeatNumber" class="form-label">Loc</label>
-                        <input asp-for="Booking.SeatNumber" class="form-control" placeholder="Ex: 12A" />
-                        <span asp-validation-for="Booking.SeatNumber" class="text-danger"></span>
-                    </div>
+        <div class="row g-4">
+            <div class="col-lg-8">
 
-                    <div class="mb-3 p-3 bg-light rounded border">
-                        <label class="form-label fw-bold mb-3">Servicii Extra:</label>
-                        <div class="row">
-                            @{
-                                int cnt = 0;
-                                foreach (var amenity in Model.AssignedAmenityDataList)
-                                {
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="selectedAmenities" value="@amenity.AmenityID" @(Html.Raw(amenity.Assigned ? "checked=\"checked\"" : "")) />
-                                            <label class="form-check-label">@amenity.Name</label>
-                                        </div>
+                <div class="passengers-container mb-4">
+                    @for (int i = 0; i < Model.PassengersCount; i++)
+                    {
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-body p-4">
+
+                                <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">
+                                    <i class="fa-solid fa-user me-2"></i>Pasager @(i + 1) @(i == 0 ? "(Contact Principal)" : "")
+                                </h5>
+
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label text-muted small fw-bold text-uppercase">Titlu</label>
+                                        <select name="Passengers[@i].Title" class="form-select border-primary-subtle" required>
+                                            <option value="">Alege...</option>
+                                            <option value="Mr.">Mr. (Dl.)</option>
+                                            <option value="Mrs.">Mrs. (Dna.)</option>
+                                            <option value="Ms.">Ms. (Dra.)</option>
+                                            <option value="Child">Copil</option>
+                                        </select>
                                     </div>
-                                }
+
+                                    <div class="col-md-5">
+                                        <label class="form-label text-muted small fw-bold text-uppercase">Nume (Familie)</label>
+                                        <input name="Passengers[@i].LastName" class="form-control border-primary-subtle" placeholder="Ex: Popescu" required />
+                                    </div>
+
+                                    <div class="col-md-5">
+                                        <label class="form-label text-muted small fw-bold text-uppercase">Prenume</label>
+                                        <input name="Passengers[@i].FirstName" class="form-control border-primary-subtle" placeholder="Ex: Ion" required />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small fw-bold text-uppercase">Data Nașterii</label>
+                                        <input type="date" name="Passengers[@i].DateOfBirth" class="form-control border-primary-subtle" max="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                                    </div>
+
+                                    @if (i == 0)
+                                    {
+                                        <div class="col-md-4">
+                                            <label class="form-label text-muted small fw-bold text-uppercase">Email Contact</label>
+                                            <input type="email" name="ContactEmail" class="form-control border-primary-subtle" placeholder="adresa@email.com" required />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-muted small fw-bold text-uppercase">Telefon Contact</label>
+                                            <input type="tel" name="ContactPhone" class="form-control border-primary-subtle" placeholder="+40 7..." required />
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-suitcase-rolling text-primary me-2"></i>Servicii Opționale</h4>
+                        <p class="text-muted small mb-4">Personalizează-ți zborul adăugând confort extra.</p>
+
+                        <div class="row g-3">
+                            @foreach (var amenity in Model.AvailableAmenities)
+                            {
+                                <div class="col-md-6">
+                                    <label class="w-100 h-100 amenity-checkbox-container">
+                                        <input type="checkbox" name="SelectedAmenities" value="@amenity.ID" class="d-none amenity-checkbox" data-price="@amenity.Price" onchange="calculateTotal()" />
+
+                                        <div class="card border border-2 rounded-4 h-100 amenity-card-visual transition cursor-pointer">
+                                            <div class="row g-0 align-items-center h-100">
+                                                <div class="col-4 h-100">
+                                                    <img src="@(string.IsNullOrEmpty(amenity.ImageUrl) ? "/images/default-service.jpg" : amenity.ImageUrl)" class="img-fluid rounded-start-4 h-100" style="object-fit: cover;" alt="">
+                                                </div>
+                                                <div class="col-8">
+                                                    <div class="card-body p-3">
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            <h6 class="fw-bold mb-1 text-primary">@amenity.Name</h6>
+                                                            <span class="badge bg-success-subtle text-success rounded-pill fw-bold">+@amenity.Price €</span>
+                                                        </div>
+                                                        <p class="small text-muted mb-0" style="font-size: 0.8rem;">@(string.IsNullOrEmpty(amenity.Description) ? "Adaugă acest serviciu la rezervarea ta." : amenity.Description)</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
                             }
                         </div>
                     </div>
+                </div>
 
-                    <div class="d-grid gap-2">
-                        <input type="submit" value="Salvează Rezervarea" class="btn btn-primary btn-lg" />
-                        <a asp-page="Index" class="btn btn-secondary">Înapoi la listă</a>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow rounded-4 position-sticky" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Sumar Rezervare</h5>
+
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                            <div class="text-center">
+                                <h4 class="fw-bold text-primary mb-0">@Model.SelectedFlight.DepartureAirport.IataCode</h4>
+                                <small class="text-muted">@Model.SelectedFlight.DepartureTime.ToString("HH:mm")</small>
+                            </div>
+                            <div class="text-center px-2">
+                                <i class="fa-solid fa-plane text-muted"></i>
+                                <div class="small text-muted mt-1" style="font-size: 0.7rem;">@Model.SelectedFlight.DepartureTime.ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="fw-bold text-primary mb-0">@Model.SelectedFlight.ArrivalAirport.IataCode</h4>
+                                <small class="text-muted">@Model.SelectedFlight.ArrivalTime.ToString("HH:mm")</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between text-muted">
+                            <span>Bilet Zbor</span>
+                            <span class="fw-semibold">@baseTotal €</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-muted">
+                            <span>Servicii Extra</span>
+                            <span class="fw-semibold text-success" id="extrasTotal">0 €</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <span class="fs-5 fw-bold text-dark">Total</span>
+                            <span class="fs-3 fw-bolder text-primary" id="grandTotal" data-base="@baseTotal">@baseTotal €</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold mt-4 shadow-sm text-uppercase rounded-pill">
+                            <i class="fa-solid fa-lock me-2"></i> Plătește și Rezervă
+                        </button>
+                        <p class="text-center text-muted mt-3 mb-0" style="font-size: 0.75rem;">Făcând click pe buton, ești de acord cu Termenii și Condițiile AngelAirlines.</p>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Cand inputul hidden este checked, schimbam borderul cardului vizual */
+    .amenity-checkbox:checked + .amenity-card-visual {
+        border-color: #0052D4 !important;
+        background-color: rgba(0, 82, 212, 0.05);
+        box-shadow: 0 0 0 3px rgba(0, 82, 212, 0.2);
+    }
+</style>
+
+<script>
+    // Script simplu pentru a actualiza pretul total in timp real cand bifezi servicii
+    function calculateTotal() {
+        let basePrice = parseFloat(document.getElementById('grandTotal').getAttribute('data-base'));
+        let extrasTotal = 0;
+
+        // Cautam toate checkboxurile bifate
+        let checkboxes = document.querySelectorAll('.amenity-checkbox:checked');
+        checkboxes.forEach(function(cb) {
+            extrasTotal += parseFloat(cb.getAttribute('data-price'));
+        });
+
+        // Actualizam textele de pe ecran
+        document.getElementById('extrasTotal').innerText = extrasTotal + ' €';
+        document.getElementById('grandTotal').innerText = (basePrice + extrasTotal) + ' €';
+    }
+</script>
