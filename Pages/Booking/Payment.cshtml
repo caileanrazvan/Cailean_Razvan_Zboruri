@@ -1,0 +1,79 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Booking.PaymentModel
+@{
+    ViewData["Title"] = "Securizare Plată";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-primary text-white p-4 text-center">
+                    <i class="fa-solid fa-lock fs-1 mb-2 text-warning"></i>
+                    <h3 class="fw-bold mb-0">Plată Securizată</h3>
+                    <p class="text-white-50 small mb-0">Zbor @Model.CurrentBooking.Flight.DepartureAirport.IataCode <i class="fa-solid fa-arrow-right mx-1"></i> @Model.CurrentBooking.Flight.ArrivalAirport.IataCode</p>
+                </div>
+
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <span class="fs-5 text-muted">Total de plată:</span>
+                        <span class="fs-2 fw-bolder text-dark">@Model.TotalAmount €</span>
+                    </div>
+
+                    <form method="post" id="paymentForm">
+                        <input type="hidden" name="bookingId" value="@Model.CurrentBooking.ID" />
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold text-uppercase">Nume pe card</label>
+                            <input type="text" class="form-control form-control-lg bg-light" placeholder="Numele exact ca pe card" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold text-uppercase">Număr Card</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-brands fa-cc-visa text-primary fs-4"></i></span>
+                                <input type="text" class="form-control form-control-lg bg-light" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold text-uppercase">Expirare</label>
+                                <input type="text" class="form-control form-control-lg bg-light" placeholder="LL/AA" maxlength="5" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold text-uppercase">Cod CVC</label>
+                                <input type="password" class="form-control form-control-lg bg-light" placeholder="***" maxlength="3" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="payButton" class="btn btn-warning btn-lg w-100 fw-bold shadow text-uppercase rounded-pill">
+                            Plătește @Model.TotalAmount €
+                        </button>
+
+                        <button class="btn btn-warning btn-lg w-100 fw-bold shadow text-uppercase rounded-pill d-none" id="loadingButton" type="button" disabled>
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Se procesează plata...
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <i class="fa-brands fa-cc-stripe fs-2 text-muted opacity-50 me-2"></i>
+                        <i class="fa-brands fa-cc-mastercard fs-2 text-muted opacity-50"></i>
+                        <p class="small text-muted mt-2">Toate tranzacțiile sunt criptate folosind standardul SSL 256-bit.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Acest script ascunde butonul normal și arată spinner-ul când se trimite formularul
+    document.getElementById('paymentForm').addEventListener('submit', function() {
+        document.getElementById('payButton').classList.add('d-none');
+        document.getElementById('loadingButton').classList.remove('d-none');
+    });
+</script>

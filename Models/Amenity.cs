@@ -11,6 +11,8 @@ namespace Cailean_Razvan_Zboruri.Models
         public decimal Price { get; set; }
         public string? ImageUrl { get; set; }
         public string? Description { get; set; }
+        // Legătura înapoi spre pasageri
+        public ICollection<Passenger> Passengers { get; set; } = new List<Passenger>();
 
         public ICollection<BookingAmenity>? BookingAmenities { get; set; }
     }

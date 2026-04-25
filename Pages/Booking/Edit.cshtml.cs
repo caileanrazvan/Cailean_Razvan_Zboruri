@@ -59,8 +59,6 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             bookingToUpdate.ContactEmail = Booking.ContactEmail;
             bookingToUpdate.ContactPhone = Booking.ContactPhone;
 
-            bookingToUpdate.SeatNumber = Booking.SeatNumber;
-
             UpdateBookingAmenities(_context, selectedAmenities, bookingToUpdate);
             await _context.SaveChangesAsync();
 

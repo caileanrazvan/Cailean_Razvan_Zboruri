@@ -33,6 +33,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
         // Array pentru a prinde ID-urile serviciilor bifate de utilizator
         [BindProperty]
         public int[] SelectedAmenities { get; set; }
+        public List<string> OccupiedSeats { get; set; } = new List<string>();
 
         public async Task<IActionResult> OnGetAsync(int? flightId, int passengers = 1)
         {
@@ -54,6 +55,14 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
             PassengersCount = passengers;
             AvailableAmenities = await _context.Amenity.ToListAsync();
+
+            // Extragem toate locurile deja rezervate pentru acest zbor
+            OccupiedSeats = await _context.Booking
+                .Where(b => b.FlightID == flightId)
+                .SelectMany(b => b.Passengers)
+                .Where(p => p.SeatNumber != null)
+                .Select(p => p.SeatNumber!)
+                .ToListAsync();
 
             return Page();
         }
@@ -81,21 +90,33 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             // 2. Adăugăm fiecare pasager din formular în lista rezervării
             foreach (var p in PassengerInputs)
             {
-                newBooking.Passengers.Add(new Passenger
+                var newPassenger = new Passenger
                 {
                     Title = p.Title,
                     FirstName = p.FirstName,
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
-                    // Primul pasager primește email-ul de contact
+                    SeatNumber = p.SeatNumber, // Salvăm locul din formular
                     Email = (newBooking.Passengers.Count == 0) ? ContactEmail : null
-                });
+                };
+
+                // NOU: Căutăm serviciile bifate de ACEST pasager și le adăugăm la profilul lui
+                if (p.SelectedAmenitiesIds != null && p.SelectedAmenitiesIds.Any())
+                {
+                    var selectedAmenities = await _context.Amenity
+                        .Where(a => p.SelectedAmenitiesIds.Contains(a.ID))
+                        .ToListAsync();
+
+                    newPassenger.Amenities = selectedAmenities;
+                }
+
+                newBooking.Passengers.Add(newPassenger);
             }
 
             _context.Booking.Add(newBooking);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Payment", new { bookingId = newBooking.ID });
         }
     }
 }

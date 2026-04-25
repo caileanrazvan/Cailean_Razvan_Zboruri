@@ -27,7 +27,17 @@ namespace Cailean_Razvan_Zboruri.Models
         public string? Email { get; set; }
 
         public string? PassportNumber { get; set; }
+
+        [Display(Name = "Loc Avion")]
+        public string? SeatNumber { get; set; }
         public string FullName => $"{Title} {FirstName} {LastName}";
+
+        // Proprietate folosită DOAR pentru a citi datele din formularul HTML
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public List<int> SelectedAmenitiesIds { get; set; } = new List<int>();
+
+        // Legătura reală cu tabelul de Servicii din baza de date
+        public ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
 
         // Legătura cu Rezervarea (Foreign Key)
         public int BookingID { get; set; }
