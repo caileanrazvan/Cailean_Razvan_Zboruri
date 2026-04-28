@@ -18,25 +18,19 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
         {
             if (id == null) return NotFound();
 
-            var booking = await _context.Booking
-                .Include(b => b.Flight)
-                .Include(b => b.Passengers)
-                .Include(b => b.BookingAmenities).ThenInclude(b => b.Amenity)
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var booking = await _context.Booking.FirstOrDefaultAsync(m => m.ID == id);
 
             if (booking == null) return NotFound();
-            Booking = booking;
 
-            // --- VERIFICARE SECURITATE ---
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bool isAdmin = User.IsInRole("Admin");
 
-            if (Booking.UserId != userId && !isAdmin)
+            // Dacă rezervarea nu îi aparține și nu este Admin, îi dăm "Access Denied" (Forbid)
+            if (booking.UserId != userId && !User.IsInRole("Admin"))
             {
-                return Forbid(); // Interzice accesul dacă nu e proprietar sau admin
+                return Forbid();
             }
-            // -----------------------------
 
+            Booking = booking;
             return Page();
         }
     }

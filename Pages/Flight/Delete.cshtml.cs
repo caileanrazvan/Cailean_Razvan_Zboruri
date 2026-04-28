@@ -1,28 +1,26 @@
-﻿using Cailean_Razvan_Zboruri.Data;
-using Cailean_Razvan_Zboruri.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Cailean_Razvan_Zboruri.Data;
+using Cailean_Razvan_Zboruri.Models;
 
 namespace Cailean_Razvan_Zboruri.Pages.Flight
 {
+    // Blocăm accesul pentru utilizatorii normali, doar Adminul are voie să șteargă
     [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
 
-        public DeleteModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public DeleteModel(AviationContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public Cailean_Razvan_Zboruri.Models.Flight Flight { get; set; } = default!;
+        public Models.Flight Flight { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -31,15 +29,16 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
                 return NotFound();
             }
 
-            var flight = await _context.Flight.FirstOrDefaultAsync(m => m.ID == id);
+            // REZOLVAREA ESTE AICI:
+            // Folosim .Include() pentru a forța încărcarea datelor despre aeroporturi
+            Flight = await _context.Flight
+                .Include(f => f.DepartureAirport)
+                .Include(f => f.ArrivalAirport)
+                .FirstOrDefaultAsync(m => m.ID == id);
 
-            if (flight == null)
+            if (Flight == null)
             {
                 return NotFound();
-            }
-            else
-            {
-                Flight = flight;
             }
             return Page();
         }
@@ -51,14 +50,16 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
                 return NotFound();
             }
 
-            var flight = await _context.Flight.FindAsync(id);
-            if (flight != null)
+            // Găsim zborul pe care vrem să îl ștergem
+            var flightToDelete = await _context.Flight.FindAsync(id);
+
+            if (flightToDelete != null)
             {
-                Flight = flight;
-                _context.Flight.Remove(Flight);
+                _context.Flight.Remove(flightToDelete);
                 await _context.SaveChangesAsync();
             }
 
+            // După ștergere, ne întoarcem la lista de zboruri
             return RedirectToPage("./Index");
         }
     }

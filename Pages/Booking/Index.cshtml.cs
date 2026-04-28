@@ -1,47 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
-using System.Security.Claims;
 
-namespace Cailean_Razvan_Zboruri.Pages.Booking
+namespace Cailean_Razvan_Zboruri.Pages.Bookings
 {
+    [Authorize] // Obligă utilizatorul să fie logat pentru a accesa pagina
     public class IndexModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
 
-        public IndexModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public IndexModel(AviationContext context)
         {
             _context = context;
         }
 
-        public IList<Cailean_Razvan_Zboruri.Models.Booking> Booking { get;set; } = default!;
+        // Inițializăm lista goală pentru a preveni erorile de tip 'source is null'
+        public IList<Models.Booking> Booking { get; set; } = new List<Models.Booking>();
 
         public async Task OnGetAsync()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isAdmin = User.IsInRole("Admin");
 
-            // Construim interogarea de bază
-            var bookingsQuery = _context.Booking
-                .Include(b => b.Flight)
+            // Construim interogarea aducând TOATE datele necesare
+            var query = _context.Booking
+                .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
+                .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
                 .Include(b => b.Passengers)
-                .Include(b => b.BookingAmenities)
-                    .ThenInclude(ba => ba.Amenity)
                 .AsQueryable();
 
-            // FILTRARE: Dacă NU este admin, vedem doar rezervările unde UserId coincide cu cel logat
+            // Filtrăm dacă nu este admin
             if (!isAdmin)
             {
-                bookingsQuery = bookingsQuery.Where(b => b.UserId == userId);
+                query = query.Where(b => b.UserId == userId);
             }
 
-            Booking = await bookingsQuery.ToListAsync();
+            // Aducem rezultatele ordonate descrescător după dată
+            Booking = await query.OrderByDescending(b => b.BookingDate).ToListAsync();
         }
     }
 }

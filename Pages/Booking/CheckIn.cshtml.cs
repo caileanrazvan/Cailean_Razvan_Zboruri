@@ -6,22 +6,20 @@ using System.Security.Claims;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
 
-namespace Cailean_Razvan_Zboruri.Pages.Bookings
+namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
-    [Authorize] // Disponibil pentru useri logați
-    public class EditModel : PageModel
+    [Authorize]
+    public class CheckInModel : PageModel
     {
         private readonly AviationContext _context;
 
-        public EditModel(AviationContext context)
+        public CheckInModel(AviationContext context)
         {
             _context = context;
         }
 
-        [BindProperty]
         public Models.Booking Booking { get; set; }
 
-        // O clasă specială doar pentru a prelua datele pasagerilor din formularul HTML
         public class PassengerEditData
         {
             public int ID { get; set; }
@@ -29,6 +27,10 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public DateTime DateOfBirth { get; set; }
+
+            // NOU: Am adăugat Pașaportul aici
+            public string? PassportNumber { get; set; }
+
             public string SeatNumber { get; set; }
             public List<int> SelectedAmenitiesIds { get; set; } = new List<int>();
         }
@@ -38,25 +40,26 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
 
         public List<Models.Amenity> AvailableAmenities { get; set; } = new List<Models.Amenity>();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int bookingId)
         {
-            if (id == null) return NotFound();
-
             Booking = await _context.Booking
                 .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
                 .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
                 .Include(b => b.Passengers).ThenInclude(p => p.Amenities)
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(b => b.ID == bookingId);
 
             if (Booking == null) return NotFound();
 
-            // Verificare: Poate edita doar Adminul sau Proprietarul
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (Booking.UserId != userId && !User.IsInRole("Admin")) return Forbid();
 
+            if (Booking.Passengers.All(p => p.IsCheckedIn))
+            {
+                return RedirectToPage("./Confirmation", new { bookingId = Booking.ID });
+            }
+
             AvailableAmenities = await _context.Amenity.ToListAsync();
 
-            // Încărcăm datele pasagerilor pentru a le afișa în formular
             foreach (var p in Booking.Passengers)
             {
                 PassengersData.Add(new PassengerEditData
@@ -66,6 +69,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
                     FirstName = p.FirstName,
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
+                    PassportNumber = p.PassportNumber, // NOU: Preluăm din baza de date
                     SeatNumber = p.SeatNumber,
                     SelectedAmenitiesIds = p.Amenities.Select(a => a.ID).ToList()
                 });
@@ -74,28 +78,22 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int id)
+        public async Task<IActionResult> OnPostAsync(int bookingId)
         {
-            var bookingToUpdate = await _context.Booking
+            var booking = await _context.Booking
                 .Include(b => b.Passengers).ThenInclude(p => p.Amenities)
-                .FirstOrDefaultAsync(s => s.ID == id);
+                .FirstOrDefaultAsync(b => b.ID == bookingId);
 
-            if (bookingToUpdate == null) return NotFound();
+            if (booking == null) return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (bookingToUpdate.UserId != userId && !User.IsInRole("Admin")) return Forbid();
+            if (booking.UserId != userId && !User.IsInRole("Admin")) return Forbid();
 
-            // 1. Actualizăm datele de contact ale rezervării (Ignorăm Zborul și Data - rămân la fel)
-            bookingToUpdate.ContactEmail = Booking.ContactEmail;
-            bookingToUpdate.ContactPhone = Booking.ContactPhone;
-
-            // 2. Actualizăm Pasagerii
             var availableAmenities = await _context.Amenity.ToListAsync();
 
             foreach (var input in PassengersData)
             {
-                // Găsim pasagerul corespunzător în baza de date
-                var passengerToUpdate = bookingToUpdate.Passengers.FirstOrDefault(p => p.ID == input.ID);
+                var passengerToUpdate = booking.Passengers.FirstOrDefault(p => p.ID == input.ID);
 
                 if (passengerToUpdate != null)
                 {
@@ -103,11 +101,13 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
                     passengerToUpdate.FirstName = input.FirstName;
                     passengerToUpdate.LastName = input.LastName;
                     passengerToUpdate.DateOfBirth = input.DateOfBirth;
+
+                    // NOU: Salvăm pașaportul
+                    passengerToUpdate.PassportNumber = input.PassportNumber;
+
                     passengerToUpdate.SeatNumber = input.SeatNumber;
 
-                    // Ștergem serviciile vechi și le adăugăm pe cele noi bifate
                     passengerToUpdate.Amenities.Clear();
-
                     if (input.SelectedAmenitiesIds != null && input.SelectedAmenitiesIds.Any())
                     {
                         var selectedAm = availableAmenities.Where(a => input.SelectedAmenitiesIds.Contains(a.ID)).ToList();
@@ -116,11 +116,13 @@ namespace Cailean_Razvan_Zboruri.Pages.Bookings
                             passengerToUpdate.Amenities.Add(am);
                         }
                     }
+
+                    passengerToUpdate.IsCheckedIn = true;
                 }
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Confirmation", new { bookingId = booking.ID });
         }
     }
 }

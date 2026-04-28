@@ -1,0 +1,131 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Booking.BookingSummaryModel
+@{
+    ViewData["Title"] = "Sumar Rezervare";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-success text-white text-center p-5 position-relative">
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);"></div>
+                    <i class="fa-solid fa-circle-check display-1 mb-3 position-relative z-1" style="filter: drop-shadow(0 0.5rem 1rem rgba(0,0,0,0.15));"></i>
+                    <h2 class="fw-bolder mb-2 position-relative z-1">Plată Confirmată!</h2>
+                    <p class="lead mb-0 opacity-75 position-relative z-1">Rezervarea ta a fost înregistrată cu succes în sistem.</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-5">
+                        <h6 class="text-muted text-uppercase small fw-bold tracking-wide letter-spacing-1">Cod Referință</h6>
+                        <div class="display-6 fw-bold text-primary font-monospace bg-light d-inline-block px-4 py-2 rounded-3 border">
+                            @Model.Booking.TransactionId
+                        </div>
+                    </div>
+
+                    <div class="border rounded-4 p-4 mb-4 bg-light position-relative shadow-sm">
+                        <h6 class="fw-bold text-primary mb-4 text-uppercase small">
+                            <i class="fa-solid fa-plane-departure me-2"></i>Itinerariu
+                        </h6>
+                        <div class="row align-items-center text-center mb-3">
+                            <div class="col-5">
+                                <h2 class="fw-bold mb-0 text-dark">@Model.Booking.Flight.DepartureAirport.IataCode</h2>
+                                <span class="text-muted small">@Model.Booking.Flight.DepartureAirport.City</span>
+                            </div>
+                            <div class="col-2">
+                                <i class="fa-solid fa-plane text-warning fs-4 opacity-50"></i>
+                            </div>
+                            <div class="col-5">
+                                <h2 class="fw-bold mb-0 text-dark">@Model.Booking.Flight.ArrivalAirport.IataCode</h2>
+                                <span class="text-muted small">@Model.Booking.Flight.ArrivalAirport.City</span>
+                            </div>
+                        </div>
+                        <hr class="my-3 border-secondary border-dashed">
+                        <div class="d-flex justify-content-between text-muted small fw-medium">
+                            <span><i class="fa-regular fa-calendar text-primary me-2"></i> @Model.Booking.Flight.DepartureTime.ToString("dd MMM yyyy, HH:mm")</span>
+                            <span><i class="fa-solid fa-hashtag text-primary me-2"></i> Zbor @Model.Booking.Flight.FlightNumber</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-5 g-4">
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-4 h-100 d-flex flex-column justify-content-center">
+                                <h6 class="fw-bold text-muted mb-2 text-uppercase small">
+                                    <i class="fa-solid fa-users me-2"></i>Pasageri
+                                </h6>
+                                <h2 class="fw-bold mb-0">@Model.Booking.Passengers.Count</h2>
+                                <span class="text-muted small">Locuri rezervate</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border border-primary-subtle bg-primary-subtle rounded-4 p-4 h-100 d-flex flex-column justify-content-center shadow-sm">
+                                <h6 class="fw-bold text-primary mb-2 text-uppercase small">
+                                    <i class="fa-solid fa-credit-card me-2"></i>Total Achitat
+                                </h6>
+                                <h2 class="fw-bold text-primary mb-0">@Model.TotalPrice €</h2>
+                                <span class="text-primary opacity-75 small"><i class="fa-solid fa-shield-halved me-1"></i>Tranzacție securizată</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info border-info-subtle rounded-4 mb-5 p-4 d-flex align-items-center shadow-sm">
+                        <i class="fa-solid fa-circle-info display-4 text-info me-4 opacity-50"></i>
+                        <div>
+                            <h5 class="fw-bold text-info-emphasis mb-2">Următorul pas: Check-in Online</h5>
+                            <p class="small mb-0 text-muted">
+                                Pentru a obține biletele finale (Boarding Pass) și a confirma locurile alese, trebuie să finalizezi procesul de Check-in și să accepți termenii de securitate ai zborului.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3 d-md-flex justify-content-md-between border-top pt-4 mt-2">
+                        <a asp-page="./Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill fw-medium transition-hover">
+                            <i class="fa-solid fa-list me-2"></i>Rezervările Mele
+                        </a>
+                        <a asp-page="./CheckIn" asp-route-bookingId="@Model.Booking.ID" class="btn btn-success btn-lg px-5 rounded-pill fw-bold shadow hover-lift text-uppercase tracking-wide">
+                            Fă Check-in Acum <i class="fa-solid fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling pentru linia punctată (gen chitanță) */
+    .border-dashed {
+        border-style: dashed !important;
+        opacity: 0.3;
+    }
+
+    /* Spațiere elegantă pentru textul majuscul */
+    .letter-spacing-1 {
+        letter-spacing: 1px;
+    }
+
+    .tracking-wide {
+        letter-spacing: 0.5px;
+    }
+
+    /* Efecte de hover pentru butoane */
+    .transition-hover {
+        transition: all 0.2s ease-in-out;
+    }
+
+        .transition-hover:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+    .hover-lift {
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3) !important;
+        }
+</style>

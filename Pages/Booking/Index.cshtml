@@ -1,80 +1,119 @@
 ﻿@page
-@model Cailean_Razvan_Zboruri.Pages.Booking.IndexModel
+@model Cailean_Razvan_Zboruri.Pages.Bookings.IndexModel
 @{
-    ViewData["Title"] = "Rezervări";
+    ViewData["Title"] = "Rezervările Mele";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1><i class="fa-solid fa-calendar-check text-primary"></i> Rezervări Active</h1>
-    <a asp-page="Create" class="btn btn-success shadow-sm"><i class="fa-solid fa-plus"></i> Rezervare Nouă</a>
-</div>
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="fa-solid fa-suitcase-rolling text-primary me-2"></i>
+            @(User.IsInRole("Admin") ? "Toate Rezervările (Mod Admin)" : "Rezervările Mele")
+        </h2>
+    </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped align-middle mb-0">
-                <thead class="bg-light text-uppercase small fw-bold">
-                    <tr>
-                        <th>Pasager</th>
-                        <th>Zbor & Loc</th>
-                        <th>Facilități Alese</th>
-                        <th>Total Plată</th>
-                        <th class="text-end" style="min-width: 150px;">Acțiuni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Booking)
-                    {
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle p-2 me-2 text-primary">
-                                        <i class="fa-solid fa-user"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">@item.Passengers.Count pasageri</div>
-                                    </div>
-                                </div>
-                            </td>
+    @if (!Model.Booking.Any())
+    {
+        <div class="alert bg-light border border-primary-subtle rounded-4 p-5 text-center shadow-sm">
+            <i class="fa-solid fa-ticket-simple display-1 text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold">Nu ai nicio rezervare înregistrată.</h4>
+            <p class="text-muted">Când vei rezerva un zbor, detaliile acestuia vor apărea aici.</p>
+            <a asp-page="/Index" class="btn btn-warning mt-3 fw-bold rounded-pill px-4">
+                <i class="fa-solid fa-magnifying-glass me-2"></i>Caută Zboruri
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model.Booking)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 transition-hover">
 
-                            <td>
-                                @if (item.BookingAmenities != null && item.BookingAmenities.Any())
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4 border-0 py-3">
+                            <span class="fw-bold fs-5">
+                                @item.Flight.DepartureAirport.IataCode
+                                <i class="fa-solid fa-plane mx-2 opacity-75 small"></i>
+                                @item.Flight.ArrivalAirport.IataCode
+                            </span>
+                            @if (item.PaymentStatus == "Paid")
+                            {
+                                <span class="badge bg-success shadow-sm">Confirmat</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark shadow-sm">Neplătit</span>
+                            }
+                        </div>
+
+                        <div class="card-body">
+                            <div class="small text-muted mb-3 pb-2 border-bottom">
+                                <span>Ref: <strong>@(item.TransactionId ?? "În curs...")</strong></span>
+                                <span class="float-end">Data achiziției: @item.BookingDate.ToString("dd.MM.yyyy")</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted"><i class="fa-solid fa-users me-2"></i>Pasageri:</span>
+                                <span class="fw-bold">@item.Passengers.Count</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted"><i class="fa-regular fa-clock me-2"></i>Plecare:</span>
+                                <span class="fw-bold text-dark">@item.Flight.DepartureTime.ToString("dd MMM HH:mm")</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0 pt-0 pb-3">
+
+                            @if (item.PaymentStatus == "Pending")
+                            {
+                                <a asp-page="./Payment" asp-route-bookingId="@item.ID" class="btn btn-warning w-100 rounded-pill mb-2 fw-bold text-uppercase">
+                                    <i class="fa-solid fa-credit-card me-1"></i> Finalizează Plata
+                                </a>
+                            }
+                            else if (item.PaymentStatus == "Paid")
+                            {
+                                // Verificăm dacă TOȚI pasagerii au făcut check-in
+                                bool allCheckedIn = item.Passengers.All(p => p.IsCheckedIn);
+
+                                if (!allCheckedIn)
                                 {
-                                    foreach (var bookingAmenity in item.BookingAmenities)
-                                    {
-                                        <span class="badge bg-info text-dark mb-1">
-                                            <i class="fa-solid fa-check"></i> @bookingAmenity.Amenity.Name
-                                        </span>
-                                        <br />
-         }
+                                    <a asp-page="./CheckIn" asp-route-bookingId="@item.ID" class="btn btn-success w-100 rounded-pill mb-2 fw-bold text-uppercase">
+                                        <i class="fa-solid fa-passport me-1"></i> Check-in Online
+                                    </a>
                                 }
                                 else
                                 {
-                                    <span class="text-muted small fs-6">Standard (Fără extra)</span>
+                                    <a asp-page="./Confirmation" asp-route-bookingId="@item.ID" class="btn btn-outline-primary w-100 rounded-pill mb-2 fw-bold">
+                                        <i class="fa-solid fa-qrcode me-1"></i> Boarding Pass Generat
+                                    </a>
                                 }
-                            </td>
+                            }
 
-                            <td>
-                                @{
-                                    decimal amenitiesCost = item.BookingAmenities.Sum(ba => ba.Amenity.Price);
-                                    decimal totalCost = item.Flight.BasePrice + amenitiesCost;
-                                }
-                                <span class="text-success fw-bold">@totalCost €</span>
-                                <div class="text-muted" style="font-size: 0.75rem;">
-                                    (Bilet: @item.Flight.BasePrice + Extra: @amenitiesCost)
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="d-flex gap-2 mt-2 pt-2 border-top">
+                                    <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-secondary w-100">Modifică</a>
+                                    <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger w-100">Anulează</a>
                                 </div>
-                            </td>
-                            <td class="text-end">
-                                <div class="btn-group" role="group">
-                                    <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-circle-info"></i></a>
-                                    <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pen"></i></a>
-                                    <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
         </div>
-    </div>
+    }
 </div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>

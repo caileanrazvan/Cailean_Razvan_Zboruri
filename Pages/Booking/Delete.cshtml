@@ -1,38 +1,54 @@
 ﻿@page
-@model Cailean_Razvan_Zboruri.Pages.Booking.DeleteModel
+@model Cailean_Razvan_Zboruri.Pages.Bookings.DeleteModel
 @{
-    ViewData["Title"] = "Șterge Rezervare";
+    ViewData["Title"] = "Anulare Rezervare";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="alert alert-danger shadow-sm text-center">
-            <h4><i class="fa-solid fa-triangle-exclamation"></i> Atenție!</h4>
-            <p>Ești sigur că vrei să anulezi și să ștergi definitiv această rezervare?</p>
-        </div>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-        <div class="card shadow-sm border-danger">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Date Rezervare</h5>
-            </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 text-muted">Pasager</dt>
+            <div class="card border-danger shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-danger text-white p-4 text-center">
+                    <i class="fa-solid fa-triangle-exclamation display-4 mb-3"></i>
+                    <h2 class="fw-bold mb-0">Anulare Rezervare</h2>
+                    <p class="mb-0 text-white-50">Această acțiune este ireversibilă!</p>
+                </div>
 
-                    <dt class="col-sm-4 text-muted">Zbor</dt>
-                    <dd class="col-sm-8"><span class="badge bg-dark">@Model.Booking.Flight.FlightNumber</span></dd>
+                <div class="card-body p-4 text-center">
+                    <h5 class="text-muted mb-4">Ești sigur că vrei să anulezi această rezervare?</h5>
 
-                    <dt class="col-sm-4 text-muted">Data Rezervării</dt>
-                    <dd class="col-sm-8">@Model.Booking.BookingDate.ToString("dd MMM yyyy, HH:mm")</dd>
-                </dl>
+                    <div class="bg-light p-3 rounded-3 text-start mb-4 border">
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted">Referință:</span>
+                            <span class="fw-bold">@(Model.Booking.TransactionId ?? "Neplătit")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted">Zbor:</span>
+                            <span class="fw-bold">@Model.Booking.Flight.DepartureAirport.IataCode <i class="fa-solid fa-arrow-right mx-1 small"></i> @Model.Booking.Flight.ArrivalAirport.IataCode</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted">Data Zborului:</span>
+                            <span class="fw-bold">@Model.Booking.Flight.DepartureTime.ToString("dd MMM yyyy, HH:mm")</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Număr Pasageri:</span>
+                            <span class="fw-bold">@Model.Booking.Passengers.Count</span>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" asp-for="Booking.ID" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a asp-page="./Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">M-am răzgândit</a>
+                            <button type="submit" class="btn btn-danger btn-lg px-4 rounded-pill fw-bold shadow-sm">
+                                <i class="fa-solid fa-trash-can me-2"></i> Confirmă Anularea
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="card-footer bg-light d-flex justify-content-end gap-2">
-                <form method="post">
-                    <input type="hidden" asp-for="Booking.ID" />
-                    <a asp-page="./Index" class="btn btn-secondary">Anulează</a>
-                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Confirmă Ștergerea</button>
-                </form>
-            </div>
+
         </div>
     </div>
 </div>

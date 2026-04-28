@@ -1,65 +1,73 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Flight.CreateModel
 @{
-    ViewData["Title"] = "Adaugă Zbor";
+    ViewData["Title"] = "Adaugă Zbor Nou";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fa-solid fa-plane-departure"></i> Adaugă Zbor Nou</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="Flight.FlightNumber" class="form-label fw-bold">Număr Zbor</label>
-                            <input asp-for="Flight.FlightNumber" class="form-control" placeholder="Ex: RO301" />
-                            <span asp-validation-for="Flight.FlightNumber" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Flight.BasePrice" class="form-label fw-bold">Preț Bază (€)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">€</span>
-                                <input asp-for="Flight.BasePrice" class="form-control" />
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-success text-white p-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-plane-circle-check me-2"></i>Adaugă Zbor Nou</h3>
+                    <p class="mb-0 opacity-75">Configurează o nouă rută în sistemul Angel Airlines</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Flight.FlightNumber" class="form-label fw-bold text-muted small text-uppercase">Număr Zbor</label>
+                                <input asp-for="Flight.FlightNumber" class="form-control form-control-lg border-2" placeholder="Ex: ANG101" required />
+                                <span asp-validation-for="Flight.FlightNumber" class="text-danger"></span>
                             </div>
-                            <span asp-validation-for="Flight.BasePrice" class="text-danger"></span>
+                            <div class="col-md-6">
+                                <label asp-for="Flight.BasePrice" class="form-label fw-bold text-muted small text-uppercase">Preț de Bază (€)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-2 border-end-0"><i class="fa-solid fa-euro-sign text-muted"></i></span>
+                                    <input asp-for="Flight.BasePrice" class="form-control form-control-lg border-2 border-start-0" placeholder="0.00" required />
+                                </div>
+                                <span asp-validation-for="Flight.BasePrice" class="text-danger"></span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mb-3 p-3 bg-light rounded mx-1 border">
-                        <div class="col-md-6">
-                            <label asp-for="Flight.DepartureAirportID" class="form-label fw-bold"><i class="fa-solid fa-plane-departure"></i> Aeroport Plecare</label>
-                            <select asp-for="Flight.DepartureAirportID" class="form-select" asp-items="ViewBag.DepartureAirportID"></select>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Flight.ArrivalAirportID" class="form-label fw-bold"><i class="fa-solid fa-plane-arrival"></i> Aeroport Sosire</label>
-                            <select asp-for="Flight.ArrivalAirportID" class="form-select" asp-items="ViewBag.ArrivalAirportID"></select>
-                        </div>
-                    </div>
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="fa-solid fa-map-location-dot me-2"></i>Rută și Program</h6>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="Flight.DepartureTime" class="form-label fw-bold">Data Plecării</label>
-                            <input asp-for="Flight.DepartureTime" class="form-control" />
-                            <span asp-validation-for="Flight.DepartureTime" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Flight.ArrivalTime" class="form-label fw-bold">Data Sosirii</label>
-                            <input asp-for="Flight.ArrivalTime" class="form-control" />
-                            <span asp-validation-for="Flight.ArrivalTime" class="text-danger"></span>
-                        </div>
-                    </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Flight.DepartureAirportID" class="form-label fw-bold text-muted small text-uppercase">Aeroport Plecare</label>
+                                <select asp-for="Flight.DepartureAirportID" class="form-select border-2" asp-items="ViewBag.DepartureAirportID"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Flight.ArrivalAirportID" class="form-label fw-bold text-muted small text-uppercase">Aeroport Sosire</label>
+                                <select asp-for="Flight.ArrivalAirportID" class="form-select border-2" asp-items="ViewBag.ArrivalAirportID"></select>
+                            </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a asp-page="Index" class="btn btn-secondary me-md-2">Anulează</a>
-                        <input type="submit" value="Salvează Zborul" class="btn btn-success px-4" />
-                    </div>
-                </form>
+                            <div class="col-md-6">
+                                <label asp-for="Flight.DepartureTime" class="form-label fw-bold text-muted small text-uppercase">Dată și Oră Plecare</label>
+                                <input asp-for="Flight.DepartureTime" class="form-control border-2" />
+                                <span asp-validation-for="Flight.DepartureTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Flight.ArrivalTime" class="form-label fw-bold text-muted small text-uppercase">Dată și Oră Sosire</label>
+                                <input asp-for="Flight.ArrivalTime" class="form-control border-2" />
+                                <span asp-validation-for="Flight.ArrivalTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end border-top pt-4">
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">Anulează</a>
+                            <button type="submit" class="btn btn-success btn-lg px-5 fw-bold shadow rounded-pill text-uppercase">
+                                <i class="fa-solid fa-floppy-disk me-2"></i> Salvează Zborul
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -68,5 +76,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
 }

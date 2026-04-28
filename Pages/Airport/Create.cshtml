@@ -4,39 +4,52 @@
     ViewData["Title"] = "Adaugă Aeroport";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fa-solid fa-location-dot"></i> Aeroport Nou</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-success text-white p-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-map-pin me-2"></i>Înregistrare Aeroport</h3>
+                    <p class="mb-0 opacity-75">Adaugă o nouă destinație în baza de date</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="Airport.IataCode" class="form-label fw-bold">Cod IATA (3 Litere)</label>
-                        <input asp-for="Airport.IataCode" class="form-control text-uppercase" placeholder="Ex: OTP" maxlength="3" />
-                        <span asp-validation-for="Airport.IataCode" class="text-danger"></span>
-                    </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label asp-for="Airport.IataCode" class="form-label fw-bold text-muted small text-uppercase">Cod IATA</label>
+                                <input asp-for="Airport.IataCode" class="form-control form-control-lg border-2 text-center fw-bold" placeholder="Ex: CLJ" maxlength="3" required />
+                                <span asp-validation-for="Airport.IataCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-8">
+                                <label asp-for="Airport.City" class="form-label fw-bold text-muted small text-uppercase">Nume Aeroport</label>
+                                <input asp-for="Airport.City" class="form-control form-control-lg border-2" placeholder="Ex: Avram Iancu International" required />
+                                <span asp-validation-for="Airport.City" class="text-danger"></span>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Airport.City" class="form-label fw-bold">Oraș</label>
-                        <input asp-for="Airport.City" class="form-control" />
-                        <span asp-validation-for="Airport.City" class="text-danger"></span>
-                    </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Airport.City" class="form-label fw-bold text-muted small text-uppercase">Oraș</label>
+                                <input asp-for="Airport.City" class="form-control border-2" placeholder="Ex: Cluj-Napoca" required />
+                                <span asp-validation-for="Airport.City" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Airport.Country" class="form-label fw-bold text-muted small text-uppercase">Țară</label>
+                                <input asp-for="Airport.Country" class="form-control border-2" placeholder="Ex: România" required />
+                                <span asp-validation-for="Airport.Country" class="text-danger"></span>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Airport.Country" class="form-label fw-bold">Țară</label>
-                        <input asp-for="Airport.Country" class="form-control" />
-                        <span asp-validation-for="Airport.Country" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <input type="submit" value="Salvează" class="btn btn-primary" />
-                        <a asp-page="Index" class="btn btn-secondary">Anulează</a>
-                    </div>
-                </form>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end border-top pt-4">
+                            <a asp-page="Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">Anulează</a>
+                            <button type="submit" class="btn btn-success btn-lg px-5 fw-bold shadow rounded-pill text-uppercase">
+                                <i class="fa-solid fa-floppy-disk me-2"></i> Salvează
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

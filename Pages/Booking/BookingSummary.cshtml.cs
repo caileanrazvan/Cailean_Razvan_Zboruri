@@ -1,21 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
 
 namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
-    public class ConfirmationModel : PageModel
+    [Authorize]
+    public class BookingSummaryModel : PageModel
     {
         private readonly AviationContext _context;
 
-        public ConfirmationModel(AviationContext context)
+        public BookingSummaryModel(AviationContext context)
         {
             _context = context;
         }
 
         public Models.Booking Booking { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int bookingId)
         {
@@ -25,11 +30,11 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
                 .Include(b => b.Passengers).ThenInclude(p => p.Amenities)
                 .FirstOrDefaultAsync(m => m.ID == bookingId);
 
-            if (Booking.Passengers.Any(p => !p.IsCheckedIn))
-            {
-                // Îl trimitem la check-in dacă încearcă să trișeze
-                return RedirectToPage("./CheckIn", new { bookingId = Booking.ID });
-            }
+            if (Booking == null) return NotFound();
+
+            // Calculăm totalul real al tranzacției
+            TotalPrice = (Booking.Flight.BasePrice * Booking.Passengers.Count) +
+                         Booking.Passengers.SelectMany(p => p.Amenities).Sum(a => a.Price);
 
             return Page();
         }

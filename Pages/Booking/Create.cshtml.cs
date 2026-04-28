@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Cailean_Razvan_Zboruri.Data;
+using Cailean_Razvan_Zboruri.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Cailean_Razvan_Zboruri.Data;
-using Cailean_Razvan_Zboruri.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Cailean_Razvan_Zboruri.Pages.Booking
 {
+    [Authorize]
     public class CreateModel : PageModel
     {
         private readonly AviationContext _context;
@@ -78,13 +81,17 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             // 1. Creăm obiectul principal de rezervare
             var newBooking = new Models.Booking
             {
                 FlightID = Booking.FlightID,
                 ContactEmail = ContactEmail,
                 ContactPhone = ContactPhone,
-                BookingDate = DateTime.Now
+                BookingDate = DateTime.Now,
+                UserId = userId, // Salvăm cine a făcut rezervarea
+                PaymentStatus = "Pending"
             };
 
             // 2. Adăugăm fiecare pasager din formular în lista rezervării

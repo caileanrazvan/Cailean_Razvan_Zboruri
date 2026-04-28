@@ -1,58 +1,57 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Flight.DeleteModel
-
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Șterge Zbor";
 }
 
-<h1>Delete</h1>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Flight</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.FlightNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.FlightNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.DepartureTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.DepartureTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.ArrivalTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.ArrivalTime)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.BasePrice)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.BasePrice)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.DepartureAirport)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.DepartureAirport.City)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight.ArrivalAirport)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Flight.ArrivalAirport.City)
-        </dd>
-    </dl>
-    
-    <form method="post">
-        <input type="hidden" asp-for="Flight.ID" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-page="./Index">Back to List</a>
-    </form>
+            <div class="card border-danger shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-danger text-white p-4 text-center">
+                    <i class="fa-solid fa-triangle-exclamation display-4 mb-3"></i>
+                    <h3 class="fw-bold mb-0">Ștergere Zbor</h3>
+                    <p class="mb-0 text-white-50">Această acțiune este ireversibilă!</p>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <h5 class="text-muted mb-4">Ești sigur că vrei să ștergi acest zbor din sistem?</h5>
+
+                    <div class="bg-light p-4 rounded-4 text-start mb-4 border border-danger-subtle">
+                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom">
+                            <span class="text-muted text-uppercase small fw-bold">Zbor:</span>
+                            <span class="fw-bold fs-5 text-primary">#@Model.Flight.FlightNumber</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom text-center">
+                            <div>
+                                <span class="fw-bold d-block">@Model.Flight.DepartureAirport.IataCode</span>
+                                <small class="text-muted">@Model.Flight.DepartureTime.ToString("dd MMM, HH:mm")</small>
+                            </div>
+                            <div class="align-self-center px-3 text-muted"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div>
+                                <span class="fw-bold d-block">@Model.Flight.ArrivalAirport.IataCode</span>
+                                <small class="text-muted">@Model.Flight.ArrivalTime.ToString("dd MMM, HH:mm")</small>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between pt-1">
+                            <span class="text-muted text-uppercase small fw-bold align-self-center">Preț de Bază:</span>
+                            <span class="fw-bold fs-5 text-success">@Model.Flight.BasePrice €</span>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" asp-for="Flight.ID" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a asp-page="./Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">M-am răzgândit</a>
+                            <button type="submit" class="btn btn-danger btn-lg px-4 rounded-pill fw-bold shadow-sm text-uppercase">
+                                <i class="fa-solid fa-trash-can me-2"></i> Confirmă Ștergerea
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

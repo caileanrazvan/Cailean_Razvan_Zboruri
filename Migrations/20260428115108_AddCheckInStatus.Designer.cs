@@ -4,6 +4,7 @@ using Cailean_Razvan_Zboruri.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cailean_Razvan_Zboruri.Migrations
 {
     [DbContext(typeof(AviationContext))]
-    partial class AviationContextModelSnapshot : ModelSnapshot
+    [Migration("20260428115108_AddCheckInStatus")]
+    partial class AddCheckInStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,39 +154,6 @@ namespace Cailean_Razvan_Zboruri.Migrations
                     b.HasIndex("BookingID");
 
                     b.ToTable("BookingAmenity");
-                });
-
-            modelBuilder.Entity("Cailean_Razvan_Zboruri.Models.ContactInfo", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WorkingHours")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("ContactInfo");
                 });
 
             modelBuilder.Entity("Cailean_Razvan_Zboruri.Models.Flight", b =>

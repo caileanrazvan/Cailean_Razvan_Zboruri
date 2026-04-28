@@ -54,7 +54,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             await _context.SaveChangesAsync();
 
             // După ce a plătit cu succes, îl trimitem la o pagină de confirmare
-            return RedirectToPage("./Confirmation", new { bookingId = booking.ID });
+            return RedirectToPage("./BookingSummary", new { bookingId = booking.ID });
         }
     }
 }

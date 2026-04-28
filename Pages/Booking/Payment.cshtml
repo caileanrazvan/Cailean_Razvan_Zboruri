@@ -33,18 +33,18 @@
                             <label class="form-label text-muted small fw-bold text-uppercase">Număr Card</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-brands fa-cc-visa text-primary fs-4"></i></span>
-                                <input type="text" class="form-control form-control-lg bg-light" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                <input type="text" id="cardNumber" class="form-control form-control-lg bg-light" placeholder="0000 0000 0000 0000" maxlength="19" required>
                             </div>
                         </div>
 
                         <div class="row mb-4">
                             <div class="col-6">
                                 <label class="form-label text-muted small fw-bold text-uppercase">Expirare</label>
-                                <input type="text" class="form-control form-control-lg bg-light" placeholder="LL/AA" maxlength="5" required>
+                                <input type="text" id="expDate" class="form-control form-control-lg bg-light" placeholder="LL/AA" maxlength="5" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label text-muted small fw-bold text-uppercase">Cod CVC</label>
-                                <input type="password" class="form-control form-control-lg bg-light" placeholder="***" maxlength="3" required>
+                                <input type="password" id="cvv" class="form-control form-control-lg bg-light" placeholder="***" maxlength="3" required>
                             </div>
                         </div>
 
@@ -71,8 +71,90 @@
 </div>
 
 <script>
-    // Acest script ascunde butonul normal și arată spinner-ul când se trimite formularul
-    document.getElementById('paymentForm').addEventListener('submit', function() {
+    // 1. FORMATĂM NUMĂRUL CARDULUI (Spațiu la fiecare 4 cifre, max 16 cifre reale)
+    const cardNumberInput = document.getElementById('cardNumber');
+    cardNumberInput.addEventListener('input', function (e) {
+        // Păstrăm doar cifrele
+        let value = e.target.value.replace(/\D/g, '');
+
+        // Limităm la 16 cifre strict
+        if (value.length > 16) {
+            value = value.slice(0, 16);
+        }
+
+        // Adăugăm un spațiu la fiecare 4 cifre pentru vizualizare (Ex: 1234 5678)
+        e.target.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    });
+
+    // 2. FORMATĂM DATA DE EXPIRARE (Format LL/AA)
+    const expDateInput = document.getElementById('expDate');
+    expDateInput.addEventListener('input', function (e) {
+        // Păstrăm doar cifrele
+        let value = e.target.value.replace(/\D/g, '');
+
+        if (value.length > 4) {
+            value = value.slice(0, 4);
+        }
+
+        // Dacă avem cel puțin luna introdusă
+        if (value.length >= 2) {
+            let month = parseInt(value.slice(0, 2));
+
+            // Nu există lună mai mare de 12 sau luna 00
+            if (month > 12) month = 12;
+            if (month === 0) month = '01';
+
+            let formattedMonth = month.toString().padStart(2, '0');
+
+            // Punem slash-ul automat dacă utilizatorul a trecut de primele 2 cifre
+            if (value.length > 2) {
+                e.target.value = formattedMonth + '/' + value.slice(2);
+            } else {
+                // Previne adăugarea slash-ului când dai Delete/Backspace
+                e.target.value = formattedMonth + (e.inputType === 'deleteContentBackward' ? '' : '/');
+            }
+        } else {
+            e.target.value = value;
+        }
+    });
+
+    // 3. FORMATĂM CVV-UL (Doar cifre, strict 3)
+    const cvvInput = document.getElementById('cvv');
+    cvvInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, ''); // Doar cifre
+        if (value.length > 3) {
+            value = value.slice(0, 3);
+        }
+        e.target.value = value;
+    });
+
+    // 4. VALIDARE FINALĂ ÎNAINTE DE PLATĂ ȘI SPINNER
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+
+        // Verificăm lungimea reală (fără spații și slash-uri)
+        const rawCard = cardNumberInput.value.replace(/\D/g, '');
+        const rawExp = expDateInput.value.replace(/\D/g, '');
+        const rawCvv = cvvInput.value.replace(/\D/g, '');
+
+        if (rawCard.length !== 16) {
+            e.preventDefault();
+            alert('Numărul cardului trebuie să conțină exact 16 cifre!');
+            return;
+        }
+
+        if (rawExp.length !== 4) {
+            e.preventDefault();
+            alert('Data expirării trebuie să fie completă (LL/AA)!');
+            return;
+        }
+
+        if (rawCvv.length !== 3) {
+            e.preventDefault();
+            alert('Codul CVC trebuie să conțină exact 3 cifre!');
+            return;
+        }
+
+        // Dacă a trecut toate testele de securitate, ascundem butonul și arătăm Spinner-ul
         document.getElementById('payButton').classList.add('d-none');
         document.getElementById('loadingButton').classList.remove('d-none');
     });

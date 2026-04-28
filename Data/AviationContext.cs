@@ -17,6 +17,7 @@ namespace Cailean_Razvan_Zboruri.Data
         public DbSet<Cailean_Razvan_Zboruri.Models.Airport> Airport { get; set; } = default!;
         public DbSet<Cailean_Razvan_Zboruri.Models.Amenity> Amenity { get; set; } = default!;
         public DbSet<Cailean_Razvan_Zboruri.Models.Booking> Booking { get; set; } = default!;
+        public DbSet<Cailean_Razvan_Zboruri.Models.ContactInfo> ContactInfo { get; set; } = default!;
 
         // ADAUGA ACEASTA METODA:
         protected override void OnModelCreating(ModelBuilder builder)

@@ -31,6 +31,7 @@ namespace Cailean_Razvan_Zboruri.Models
         [Display(Name = "Loc Avion")]
         public string? SeatNumber { get; set; }
         public string FullName => $"{Title} {FirstName} {LastName}";
+        public bool IsCheckedIn { get; set; } = false;
 
         // Proprietate folosită DOAR pentru a citi datele din formularul HTML
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]

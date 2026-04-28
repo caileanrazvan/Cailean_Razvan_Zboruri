@@ -1,40 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Cailean_Razvan_Zboruri.Pages.Amenity
 {
     [Authorize(Roles = "Admin")]
     public class CreateModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
+        private readonly IWebHostEnvironment _environment; // Pentru a accesa wwwroot
 
-        public CreateModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public CreateModel(AviationContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
-        public IActionResult OnGet()
-        {
-            return Page();
-        }
+        public IActionResult OnGet() { return Page(); }
 
         [BindProperty]
-        public Cailean_Razvan_Zboruri.Models.Amenity Amenity { get; set; } = default!;
+        public Models.Amenity Amenity { get; set; }
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+        [BindProperty]
+        public IFormFile? UploadedImage { get; set; } // Proprietate pentru fișier
+
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            if (UploadedImage != null)
             {
-                return Page();
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(UploadedImage.FileName);
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "amenities");
+
+                Directory.CreateDirectory(uploadsFolder); // Creează folderul dacă nu există
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await UploadedImage.CopyToAsync(stream);
+                }
+
+                Amenity.ImageUrl = "/uploads/amenities/" + fileName;
             }
 
             _context.Amenity.Add(Amenity);
