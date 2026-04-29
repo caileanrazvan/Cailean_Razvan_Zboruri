@@ -48,7 +48,8 @@
 
                             <div class="col-md-6">
                                 <label asp-for="Flight.DepartureTime" class="form-label fw-bold text-muted small text-uppercase">Dată și Oră Plecare</label>
-                                <input asp-for="Flight.DepartureTime" class="form-control border-2" />
+                                <input asp-for="Flight.DepartureTime" class="form-control border-2"
+                                       min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
                                 <span asp-validation-for="Flight.DepartureTime" class="text-danger"></span>
                             </div>
                             <div class="col-md-6">

@@ -25,6 +25,7 @@
                         <div class="row text-center align-items-center">
                             <div class="col-md-4 mb-3 mb-md-0">
                                 <h2 class="fw-bold mb-0 text-primary">@Model.Booking.Flight.DepartureAirport.IataCode</h2>
+                                <div class="fw-bold small">@Model.Booking.Flight.DepartureAirport.Name</div>
                                 <span class="text-muted small">@Model.Booking.Flight.DepartureAirport.City</span><br />
                                 <span class="fw-bold text-dark">@Model.Booking.Flight.DepartureTime.ToString("HH:mm")</span>
                             </div>
@@ -36,6 +37,7 @@
                             </div>
                             <div class="col-md-4">
                                 <h2 class="fw-bold mb-0 text-primary">@Model.Booking.Flight.ArrivalAirport.IataCode</h2>
+                                <div class="fw-bold small">@Model.Booking.Flight.ArrivalAirport.Name</div>
                                 <span class="text-muted small">@Model.Booking.Flight.ArrivalAirport.City</span><br />
                                 <span class="fw-bold text-dark">@Model.Booking.Flight.ArrivalTime.ToString("HH:mm")</span>
                             </div>
@@ -81,6 +83,10 @@
                                 <div class="col-md-5">
                                     <label class="form-label text-muted small fw-bold text-uppercase">Seria și Nr. Pașaport</label>
                                     <input asp-for="PassengersData[i].PassportNumber" class="form-control border-danger-subtle bg-white" placeholder="Document Călătorie" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-warning small fw-bold text-uppercase">Loc</label>
+                                    <input asp-for="PassengersData[i].SeatNumber" class="form-control border-warning bg-warning-subtle text-center fw-bold fs-5" readonly />
                                 </div>
                             </div>
 

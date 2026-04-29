@@ -39,7 +39,8 @@
                     <div class="row mb-4">
                         <div class="col-5">
                             <h2 class="fw-bolder mb-0">@Model.Booking.Flight.DepartureAirport.IataCode</h2>
-                            <div class="text-muted small">@Model.Booking.Flight.DepartureAirport.City</div>
+                            <div class="text-muted small fw-bold">@Model.Booking.Flight.DepartureAirport.Name</div>
+                            <div class="text-muted small" style="font-size: 0.7rem;">@Model.Booking.Flight.DepartureAirport.City</div>
                             <div class="fw-bold mt-2">@Model.Booking.Flight.DepartureTime.ToString("HH:mm")</div>
                         </div>
                         <div class="col-2 text-center align-self-center">
@@ -47,7 +48,8 @@
                         </div>
                         <div class="col-5 text-end">
                             <h2 class="fw-bolder mb-0">@Model.Booking.Flight.ArrivalAirport.IataCode</h2>
-                            <div class="text-muted small">@Model.Booking.Flight.ArrivalAirport.City</div>
+                            <div class="text-muted small fw-bold">@Model.Booking.Flight.ArrivalAirport.Name</div>
+                            <div class="text-muted small" style="font-size: 0.7rem;">@Model.Booking.Flight.ArrivalAirport.City</div>
                             <div class="fw-bold mt-2">@Model.Booking.Flight.ArrivalTime.ToString("HH:mm")</div>
                         </div>
                     </div>

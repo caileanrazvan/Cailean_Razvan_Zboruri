@@ -25,6 +25,16 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
 
         public async Task OnGetAsync(int? departureId, int? arrivalId, DateTime? flightDate, int passengers = 1)
         {
+            var flightsQuery = _context.Flight
+        .Include(f => f.DepartureAirport)
+        .Include(f => f.ArrivalAirport)
+        .AsQueryable();
+
+            // REGULĂ: Dacă NU este Admin, arătăm doar zborurile din viitor
+            if (!User.IsInRole("Admin"))
+            {
+                flightsQuery = flightsQuery.Where(f => f.DepartureTime >= DateTime.Now);
+            }
             // Salvăm datele pentru a le afișa în header-ul paginii de rezultate
             SearchDate = flightDate;
             Passengers = passengers < 1 ? 1 : passengers;
@@ -61,7 +71,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
             }
 
             // 5. La final, extragem rezultatele filtrate din baza de date
-            Flight = await query.OrderBy(f => f.DepartureTime).ToListAsync();
+            Flight = await flightsQuery.OrderBy(f => f.DepartureTime).ToListAsync();
         }
     }
 }

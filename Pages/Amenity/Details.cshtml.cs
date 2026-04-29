@@ -1,44 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Cailean_Razvan_Zboruri.Data;
 using Cailean_Razvan_Zboruri.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Cailean_Razvan_Zboruri.Pages.Amenity
 {
-    [Authorize(Roles = "Admin")]
     public class DetailsModel : PageModel
     {
-        private readonly Cailean_Razvan_Zboruri.Data.AviationContext _context;
+        private readonly AviationContext _context;
 
-        public DetailsModel(Cailean_Razvan_Zboruri.Data.AviationContext context)
+        public DetailsModel(AviationContext context)
         {
             _context = context;
         }
 
-        public Cailean_Razvan_Zboruri.Models.Amenity Amenity { get; set; } = default!;
+        public Models.Amenity Amenity { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var amenity = await _context.Amenity.FirstOrDefaultAsync(m => m.ID == id);
-            if (amenity == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                Amenity = amenity;
-            }
+            // Căutăm serviciul în baza de date pe baza ID-ului
+            Amenity = await _context.Amenity.FirstOrDefaultAsync(m => m.ID == id);
+
+            if (Amenity == null) return NotFound();
+
             return Page();
         }
     }

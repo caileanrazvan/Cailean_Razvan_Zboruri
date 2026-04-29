@@ -48,14 +48,18 @@
                             @(string.IsNullOrEmpty(item.Description) ? "Fără descriere disponibilă." : item.Description)
                         </p>
 
+                        <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-outline-primary rounded-pill w-100 fw-bold mb-2 transition-hover">
+                            Vezi Detalii <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+
                         @if (User.IsInRole("Admin"))
                         {
-                            <div class="d-flex gap-2 justify-content-center border-top pt-3 mt-auto">
-                                <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold flex-grow-1">
-                                    <i class="fa-solid fa-pen me-1"></i> Edit
+                            <div class="d-flex gap-2 justify-content-center border-top pt-3 mt-2">
+                                <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-warning rounded-pill px-3 fw-bold flex-grow-1">
+                                    <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold flex-grow-1">
-                                    <i class="fa-solid fa-trash me-1"></i> Șterge
+                                <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold flex-grow-1">
+                                    <i class="fa-solid fa-trash"></i> Șterge
                                 </a>
                             </div>
                         }

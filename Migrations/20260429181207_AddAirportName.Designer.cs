@@ -4,6 +4,7 @@ using Cailean_Razvan_Zboruri.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cailean_Razvan_Zboruri.Migrations
 {
     [DbContext(typeof(AviationContext))]
-    partial class AviationContextModelSnapshot : ModelSnapshot
+    [Migration("20260429181207_AddAirportName")]
+    partial class AddAirportName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

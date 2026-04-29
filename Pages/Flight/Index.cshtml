@@ -55,63 +55,107 @@
         }
         else
         {
-            @foreach (var item in Model.Flight)
-            {
-                <div class="card border-0 shadow-sm mb-4 rounded-4 flight-list-card transition">
-                    <div class="card-body p-0">
-                        <div class="row g-0 align-items-center">
+        @foreach (var item in Model.Flight)
+        {
+            // Verificăm dacă zborul este în trecut
+            bool isPast = item.DepartureTime < DateTime.Now;
 
-                            <div class="col-md-9 p-4">
-                                <div class="d-flex align-items-center justify-content-between">
+            <div class="card border-0 shadow-sm mb-4 rounded-4 flight-list-card transition @(isPast ? "border border-danger bg-danger-subtle" : "")">
 
-                                    <div class="text-center" style="width: 120px;">
-                                        <h3 class="fw-bold text-dark mb-0">@item.DepartureTime.ToString("HH:mm")</h3>
-                                        <div class="text-primary small fw-bold mb-2">@item.DepartureTime.ToString("dd MMM yyyy")</div>
-                                        <div class="text-muted small">@item.DepartureAirport.City</div>
-                                        <div class="badge bg-light text-dark mt-1 border">@item.DepartureAirport.IataCode</div>
-                                    </div>
+                @if (isPast)
+                {
+                    <div class="position-absolute top-0 start-50 translate-middle-x badge bg-danger shadow-sm" style="margin-top: -10px; z-index: 5;">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> ZBOR TRECUT (ISTORIC)
+                    </div>
+                }
 
-                                    <div class="flex-grow-1 px-4 text-center position-relative">
-                                        <div class="text-muted small fw-bold mb-1">Direct</div>
-                                        <div class="border-top border-2 border-primary-subtle position-relative">
-                                            <i class="fa-solid fa-plane text-primary position-absolute top-50 start-50 translate-middle bg-white px-2"></i>
-                                        </div>
-                                    </div>
+                <div class="card-body p-0 @(isPast ? "opacity-75" : "")">
+                    <div class="row g-0 align-items-center">
 
-                                    <div class="text-center" style="width: 120px;">
-                                        <h3 class="fw-bold text-dark mb-0">@item.ArrivalTime.ToString("HH:mm")</h3>
-                                        <div class="text-primary small fw-bold mb-2">@item.ArrivalTime.ToString("dd MMM yyyy")</div>
-                                        <div class="text-muted small">@item.ArrivalAirport.City</div>
-                                        <div class="badge bg-light text-dark mt-1 border">@item.ArrivalAirport.IataCode</div>
-                                    </div>
+                        <div class="col-md-9 p-4">
+                            <div class="d-flex align-items-center justify-content-between">
 
+                                <div class="text-center" style="width: 120px;">
+                                    <h3 class="fw-bold text-dark mb-0">@item.DepartureTime.ToString("HH:mm")</h3>
+                                    <div class="text-primary small fw-bold mb-2">@item.DepartureTime.ToString("dd MMM yyyy")</div>
+                                    <div class="text-dark small fw-bold">@item.DepartureAirport.Name</div>
+                                    <div class="text-muted small">@item.DepartureAirport.City</div>
+                                    <div class="badge bg-light text-dark mt-1 border">@item.DepartureAirport.IataCode</div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-3 bg-light p-4 h-100 d-flex flex-column justify-content-center align-items-center border-start rounded-end-4 position-relative" style="min-height: 160px;">
-                                <div class="text-muted small mb-1">Preț pe pasager</div>
-                                <h2 class="text-success fw-bolder mb-3">@item.BasePrice €</h2>
-                                <a asp-page="/Booking/Create" asp-route-flightId="@item.ID" asp-route-passengers="@Model.Passengers" class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm mb-2">
-                                    Alege <i class="fa-solid fa-chevron-right ms-1"></i>
-                                </a>
-
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <div class="d-flex gap-1 mt-2 border-top pt-2 w-100 justify-content-center">
-                                        <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-xs btn-outline-warning rounded-pill" title="Editează Zborul">
-                                            <i class="fa-solid fa-pen small"></i> <span class="small">Edit</span>
-                                        </a>
-                                        <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-xs btn-outline-danger rounded-pill" title="Șterge Zborul">
-                                            <i class="fa-solid fa-trash small"></i> <span class="small">Șterge</span>
-                                        </a>
+                                <div class="flex-grow-1 px-4 text-center position-relative">
+                                    <div class="text-muted small fw-bold mb-1">Direct</div>
+                                    <div class="border-top border-2 border-primary-subtle position-relative">
+                                        <i class="fa-solid fa-plane text-primary position-absolute top-50 start-50 translate-middle bg-white px-2"></i>
                                     </div>
-                                }
-                            </div>
+                                </div>
 
+                                <div class="text-center" style="width: 120px;">
+                                    <h3 class="fw-bold text-dark mb-0">@item.ArrivalTime.ToString("HH:mm")</h3>
+                                    <div class="text-primary small fw-bold mb-2">@item.ArrivalTime.ToString("dd MMM yyyy")</div>
+                                    <div class="text-dark small fw-bold">@item.ArrivalAirport.Name</div>
+                                    <div class="text-muted small">@item.ArrivalAirport.City</div>
+                                    <div class="badge bg-light text-dark mt-1 border">@item.ArrivalAirport.IataCode</div>
+                                </div>
+
+                            </div>
                         </div>
+
+                        <div class="col-md-3 bg-light p-4 h-100 d-flex flex-column justify-content-center align-items-center border-start rounded-end-4 position-relative" style="min-height: 160px;">
+                            <div class="text-muted small mb-1">Preț pe pasager</div>
+                            <h2 class="text-success fw-bolder mb-3">@item.BasePrice €</h2>
+
+                            @if (!isPast)
+                            {
+                                <form method="get" asp-page="/Booking/Create" class="w-100">
+                                    <input type="hidden" name="flightId" value="@item.ID" />
+                                    <div class="input-group mb-3 bg-white border rounded-pill overflow-hidden shadow-sm">
+                                        <span class="input-group-text bg-transparent border-0 text-primary ps-3">
+                                            <i class="fa-solid fa-users"></i>
+                                        </span>
+                                        <select name="passengers" class="form-select border-0 shadow-none fw-bold bg-transparent cursor-pointer">
+                                            @for (int p = 1; p <= 9; p++)
+                                            {
+                                                if (Model.Passengers == p)
+                                                {
+                                                    <option value="@p" selected>@p Pasageri</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@p">@p Pasageri</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm mb-2 text-uppercase tracking-wide transition-hover">
+                                        Alege <i class="fa-solid fa-chevron-right ms-1"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary w-100 rounded-pill mb-2 fw-bold" disabled>
+                                    Indisponibil
+                                </button>
+                            }
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="d-flex gap-1 mt-2 border-top pt-2 w-100 justify-content-center">
+                                    <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-xs btn-outline-warning rounded-pill" title="Editează Zborul">
+                                        <i class="fa-solid fa-pen small"></i> <span class="small">Edit</span>
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-xs btn-outline-danger rounded-pill" title="Șterge Zborul">
+                                        <i class="fa-solid fa-trash small"></i> <span class="small">Șterge</span>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
                     </div>
                 </div>
-            }
+            </div>
+        }
         }
     </div>
 </div>
@@ -135,5 +179,13 @@
 
     .filter-grayscale {
         filter: grayscale(100%);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .tracking-wide {
+        letter-spacing: 0.5px;
     }
 </style>

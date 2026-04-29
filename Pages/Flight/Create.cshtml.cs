@@ -34,8 +34,17 @@ namespace Cailean_Razvan_Zboruri.Pages.Flight
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            // VALIDARE: Verificăm dacă data este în trecut
+            if (Flight.DepartureTime < DateTime.Now)
+            {
+                ModelState.AddModelError("Flight.DepartureTime", "Nu poți crea un zbor într-o dată din trecut.");
+            }
+
             if (!ModelState.IsValid)
             {
+                // Re-populăm listele pentru dropdown-uri dacă au apărut erori
+                ViewData["DepartureAirportID"] = new SelectList(_context.Airport, "ID", "Name");
+                ViewData["ArrivalAirportID"] = new SelectList(_context.Airport, "ID", "Name");
                 return Page();
             }
 
