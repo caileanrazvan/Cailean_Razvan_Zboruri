@@ -46,6 +46,15 @@
                                 </a>
                             </li>
 
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white fw-bold px-3 nav-hover" asp-page="/Admin/Dashboard">
+                                        <i class="fa-solid fa-chart-pie text-warning"></i> Dashboard
+                                    </a>
+                                </li>
+                            }
+
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
                                 <li class="nav-item mx-2 d-none d-sm-block">
@@ -82,7 +91,7 @@
         </header>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>

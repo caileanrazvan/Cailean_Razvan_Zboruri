@@ -47,19 +47,31 @@ namespace Cailean_Razvan_Zboruri.Pages.Airport
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var airport = await _context.Airport.FindAsync(id);
             if (airport != null)
             {
-                Airport = airport;
-                _context.Airport.Remove(Airport);
+                // 1. Zborurile afectate
+                var flights = await _context.Flight
+                    .Where(f => f.DepartureAirportID == id || f.ArrivalAirportID == id)
+                    .ToListAsync();
+
+                var flightIds = flights.Select(f => f.ID).ToList();
+
+                // 2. Rezervările zborurilor
+                var bookings = await _context.Booking
+                    .Include(b => b.Passengers)
+                    .Where(b => b.FlightID.HasValue && flightIds.Contains(b.FlightID.Value))
+                    .ToListAsync();
+
+                // 3. Ștergem tot în cascadă
+                _context.Booking.RemoveRange(bookings);
+                _context.Flight.RemoveRange(flights);
+                _context.Airport.Remove(airport);
+
                 await _context.SaveChangesAsync();
             }
-
             return RedirectToPage("./Index");
         }
     }

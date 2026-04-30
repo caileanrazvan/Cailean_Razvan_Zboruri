@@ -1,0 +1,156 @@
+﻿@page
+@model Cailean_Razvan_Zboruri.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Panou de Control";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="mb-5">
+        <h2 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Tablou de Bord</h2>
+        <p class="text-muted">Statistici și performanțe în timp real pentru rețeaua Angel Airlines.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-success text-white p-4 transition-hover">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-white bg-opacity-25 rounded-3 p-2">
+                        <i class="fa-solid fa-wallet fs-4"></i>
+                    </div>
+                    <span class="badge bg-white text-success rounded-pill">Luna curentă</span>
+                </div>
+                <h3 class="fw-bold mb-1">@Model.TotalRevenue.ToString("N0") €</h3>
+                <small class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem;">Venituri Generate</small>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary text-white p-4 transition-hover">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-white bg-opacity-25 rounded-3 p-2">
+                        <i class="fa-solid fa-users fs-4"></i>
+                    </div>
+                    <span class="badge bg-white text-primary rounded-pill">Luna curentă</span>
+                </div>
+                <h3 class="fw-bold mb-1">@Model.PassengersThisMonth</h3>
+                <small class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem;">Bilete Vândute</small>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-warning text-dark p-4 transition-hover">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-dark bg-opacity-10 rounded-3 p-2">
+                        <i class="fa-solid fa-plane-departure fs-4"></i>
+                    </div>
+                    <span class="badge bg-dark text-warning rounded-pill">Viitor</span>
+                </div>
+                <h3 class="fw-bold mb-1">@Model.ActiveFlights</h3>
+                <small class="text-dark opacity-75 text-uppercase fw-bold" style="font-size: 0.75rem;">Zboruri Programate</small>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-danger text-white p-4 transition-hover">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-white bg-opacity-25 rounded-3 p-2">
+                        <i class="fa-solid fa-fire fs-4"></i>
+                    </div>
+                    <span class="badge bg-white text-danger rounded-pill">All time</span>
+                </div>
+                <h4 class="fw-bold mb-2 text-truncate" title="@Model.PopularDestination">@Model.PopularDestination</h4>
+                <small class="text-white-50 text-uppercase fw-bold" style="font-size: 0.75rem;">Top Destinație</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-chart-line text-primary me-2"></i>Evoluție Rezervări</h5>
+                    <span class="text-muted small fw-bold text-uppercase">Ultimele 7 zile</span>
+                </div>
+
+                <div style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="bookingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('bookingsChart').getContext('2d');
+
+            // Preluăm datele calculate în C# și le trecem în JavaScript
+            const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartLabels));
+            const dataValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData));
+
+            // Configurăm un gradient frumos pentru linia graficului
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 82, 212, 0.5)'); // Albastru Angel Airlines
+            gradient.addColorStop(1, 'rgba(0, 82, 212, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Bilete Rezervate',
+                        data: dataValues,
+                        borderColor: '#0052D4',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0052D4',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Face linia curbată (smooth)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#2c3e50',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: '#6c757d' },
+                            grid: { borderDash: [5, 5], color: '#e9ecef' }
+                        },
+                        x: {
+                            ticks: { color: '#6c757d', font: { weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -22,6 +22,7 @@ namespace Cailean_Razvan_Zboruri.Models
         [Range(1, 10000, ErrorMessage = "Prețul trebuie să fie între 1 și 10000.")]
         [Column(TypeName = "decimal(6, 2)")]
         public decimal BasePrice { get; set; }
+        public bool IsCancelled { get; set; } = false;
 
         [Display(Name = "Aeroport Plecare")]
         public int DepartureAirportID { get; set; }

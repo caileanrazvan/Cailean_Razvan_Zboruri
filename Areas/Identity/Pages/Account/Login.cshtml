@@ -1,54 +1,95 @@
 ﻿@page
 @model LoginModel
 @{
-    ViewData["Title"] = "Autentificare AngelAirlines";
+    ViewData["Title"] = "Autentificare";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white text-center py-4">
-                <h2 class="mb-0"><i class="fa-solid fa-plane-up"></i></h2>
-                <h4 class="fw-bold">AngelAirlines</h4>
-                <p class="small mb-0">Bun venit la bord! Autentifică-te pentru a continua.</p>
+<div class="container-fluid bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="max-width: 1000px; width: 100%;">
+        <div class="row g-0">
+
+            <!-- Partea Stângă: Imaginea -->
+            <div class="col-md-6 d-none d-md-block position-relative bg-primary"
+                 style="background: linear-gradient(135deg, rgba(0, 82, 212, 0.4) 0%, rgba(67, 100, 247, 0.4) 100%), url('/images/login1_bg.png') center/cover;">
+                <div class="position-absolute top-50 start-50 translate-middle text-center w-100 px-5">
+                    <h2 class="text-white fw-bold mb-3">Bine ai revenit!</h2>
+                    <p class="text-white-50 fs-5">Conectează-te pentru a-ți gestiona rezervările, a face check-in și a descărca biletele de îmbarcare.</p>
+                </div>
             </div>
-            <div class="card-body p-4">
+
+            <!-- Partea Dreaptă: Formularul -->
+            <div class="col-md-6 p-4 p-md-5 bg-white">
+
+                <!-- BUTONUL NOU DE ÎNTOARCERE -->
+                <a asp-page="/Index" class="text-decoration-none text-muted small fw-bold d-inline-block mb-4 transition-hover-text">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Înapoi acasă
+                </a>
+
+                <div class="text-center mb-5">
+                    <h3 class="fw-bolder text-dark">Autentificare</h3>
+                    <p class="text-muted">Introdu detaliile contului tău Angel Airlines</p>
+                </div>
+
                 <form id="account" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center fw-bold"></div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.UserNameOrEmail" class="form-control" autocomplete="username" placeholder="numele_tău sau email@domeniu.com" />
-                        <label asp-for="Input.UserNameOrEmail"><i class="fa-solid fa-user me-2"></i>Email sau Nume de Utilizator</label>
-                        <span asp-validation-for="Input.UserNameOrEmail" class="text-danger"></span>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.UserNameOrEmail" class="form-control border-2 rounded-3" autocomplete="username" aria-required="true" placeholder="numele_tău sau email@domeniu.com" />
+                        <label asp-for="Input.UserNameOrEmail" class="text-muted"><i class="fa-solid fa-user me-2"></i>Email sau Nume de Utilizator</label>
+                        <span asp-validation-for="Input.UserNameOrEmail" class="text-danger small fw-bold"></span>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="password" />
-                        <label asp-for="Input.Password"><i class="fa-solid fa-lock me-2"></i>Parolă</label>
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.Password" class="form-control border-2 rounded-3" autocomplete="current-password" aria-required="true" placeholder="parola" />
+                        <label asp-for="Input.Password" class="text-muted"><i class="fa-solid fa-lock me-2"></i>Parola</label>
+                        <span asp-validation-for="Input.Password" class="text-danger small fw-bold"></span>
                     </div>
 
-                    <div class="checkbox mb-3">
-                        <label asp-for="Input.RememberMe" class="form-label">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
                             <input class="form-check-input" asp-for="Input.RememberMe" />
-                            Ține-mă minte
-                        </label>
+                            <label class="form-check-label text-muted small" asp-for="Input.RememberMe">
+                                Ține-mă minte
+                            </label>
+                        </div>
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="text-primary text-decoration-none small fw-bold">Ai uitat parola?</a>
                     </div>
 
-                    <div class="d-grid">
-                        <button id="login-submit" type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
-                            Conectare
-                        </button>
+                    <button id="login-submit" type="submit" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm mb-4 transition-hover">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Intră în Cont
+                    </button>
+
+                    <div class="text-center border-top pt-4">
+                        <p class="text-muted small mb-0">Nu ai încă un cont?</p>
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-outline-secondary rounded-pill px-4 mt-2 fw-bold">
+                            Creează Cont Nou
+                        </a>
                     </div>
                 </form>
             </div>
-            <div class="card-footer bg-light text-center py-3">
-                <p class="mb-0 small">Nu ai cont? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary fw-bold">Înregistrează-te aici</a></p>
-            </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .transition-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .transition-hover:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            }
+
+        .transition-hover-text:hover {
+            color: #0052D4 !important;
+        }
+
+        header, footer {
+            display: none !important;
+        }
+    </style>
 }

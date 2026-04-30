@@ -4,14 +4,19 @@
     ViewData["Title"] = "Contact";
 }
 
-<div class="container mt-5 mb-5">
+<!-- ELEMENTELE PENTRU FUNDAL -->
+<div class="contact-background"></div>
+<div class="contact-overlay"></div>
+
+<!-- Am adăugat 'position-relative' pentru a sta deasupra fundalului -->
+<div class="container mt-5 mb-5 position-relative" style="z-index: 1;">
     <div class="row justify-content-center">
         <div class="col-lg-8">
 
             <div class="text-center mb-5">
                 <i class="fa-solid fa-headset display-4 text-primary mb-3"></i>
-                <h1 class="fw-bold">Contactați-ne</h1>
-                <p class="lead text-muted">@Model.ContactInfo.Description</p>
+                <h1 class="fw-bold">Contactează-ne</h1>
+                <p class="lead text-dark fw-medium opacity-75">@Model.ContactInfo.Description</p>
 
                 @if (User.IsInRole("Admin"))
                 {
@@ -25,7 +30,7 @@
 
             <div class="row g-4">
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover bg-white bg-opacity-75 glass-card">
                         <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
                             <i class="fa-solid fa-phone fs-4"></i>
                         </div>
@@ -35,7 +40,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover bg-white bg-opacity-75 glass-card">
                         <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
                             <i class="fa-solid fa-envelope fs-4"></i>
                         </div>
@@ -45,7 +50,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover bg-white bg-opacity-75 glass-card">
                         <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
                             <i class="fa-solid fa-location-dot fs-4"></i>
                         </div>
@@ -55,7 +60,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 text-center p-4 transition-hover bg-white bg-opacity-75 glass-card">
                         <div class="bg-warning-subtle text-warning-emphasis rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
                             <i class="fa-solid fa-clock fs-4"></i>
                         </div>
@@ -70,12 +75,46 @@
 </div>
 
 <style>
+    /* --- STILURI PENTRU FUNDAL --- */
+    .contact-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        /* Schimbă calea de mai jos cu imaginea ta din folderul wwwroot/images */
+        background-image: url('/images/clouds_bg.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: -2;
+    }
+
+    .contact-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(248, 249, 250, 0.75); /* Alb/gri semi-transparent */
+        backdrop-filter: blur(8px); /* Efect de sticlă blurată */
+        -webkit-backdrop-filter: blur(8px);
+        z-index: -1;
+    }
+
+    /* --- STILURI PENTRU CARDURI --- */
+    .glass-card {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    }
+
     .transition-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
         .transition-hover:hover {
             transform: translateY(-5px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            box-shadow: 0 1rem 2rem rgba(0,0,0,.1) !important;
         }
 </style>

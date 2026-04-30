@@ -88,13 +88,23 @@
                                 </div>
                                 <div class="text-end">
                                     <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.65rem;">Status</small>
-                                    @if (item.PaymentStatus == "Paid")
+                                    @if (item.PaymentStatus == "Anulat")
                                     {
-                                        <span class="badge bg-success px-2 py-1"><i class="fa-solid fa-check-circle me-1"></i>Confirmat</span>
+                                        <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm">
+                                            <i class="fa-solid fa-ban me-1"></i> Anulat
+                                        </span>
+                                    }
+                                    else if (item.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">
+                                            <i class="fa-solid fa-check me-1"></i> Plătit
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-hourglass-half me-1"></i>În așteptare</span>
+                                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm">
+                                            <i class="fa-solid fa-clock me-1"></i> În așteptare
+                                        </span>
                                     }
                                 </div>
                             </div>
@@ -164,7 +174,7 @@
                                     else
                                     {
                                         <a asp-page="./Confirmation" asp-route-bookingId="@item.ID" class="btn btn-outline-primary w-100 rounded-pill mb-2 fw-bold">
-                                            <i class="fa-solid fa-qrcode me-1"></i> Vezi Boarding Pass
+                                            <i class="fa-solid fa-qrcode me-1"></i> Boarding Pass
                                         </a>
                                     }
                                 }
@@ -174,10 +184,10 @@
                             {
                                 <div class="d-flex gap-2 justify-content-center mt-2 border-top pt-3">
                                     <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning rounded-pill px-4 fw-bold" title="Editează">
-                                        <i class="fa-solid fa-pen me-1"></i> Edit
+                                        <i class="fa-solid fa-pen me-1"></i> Editează
                                     </a>
                                     <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger rounded-pill px-4 fw-bold" title="Șterge">
-                                        <i class="fa-solid fa-trash me-1"></i> Delete
+                                        <i class="fa-solid fa-trash me-1"></i> Șterge
                                     </a>
                                 </div>
                             }

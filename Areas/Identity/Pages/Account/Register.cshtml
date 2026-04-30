@@ -4,61 +4,99 @@
     ViewData["Title"] = "Înregistrare AngelAirlines";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-success text-white text-center py-4">
-                <h2 class="mb-0"><i class="fa-solid fa-user-plus"></i></h2>
-                <h4 class="fw-bold">Creează Cont Nou</h4>
-                <p class="small mb-0">Alătură-te flotei AngelAirlines</p>
+<div class="container-fluid bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="max-width: 1000px; width: 100%;">
+        <div class="row g-0 flex-md-row-reverse">
+
+            <!-- Partea Dreaptă: Imaginea -->
+            <div class="col-md-6 d-none d-md-block position-relative bg-success"
+                 style="background: linear-gradient(135deg, rgba(0, 82, 212, 0.4) 0%, rgba(67, 100, 247, 0.4) 100%), url('/images/register1_bg.png') center/cover;">
+                <div class="position-absolute top-50 start-50 translate-middle text-center w-100 px-5">
+                    <h2 class="text-white fw-bold mb-3">Începe Călătoria</h2>
+                    <p class="text-white-50 fs-5">Creează-ți un cont gratuit pentru a rezerva zboruri mai rapid și pentru a avea acces la întregul tău istoric de călătorii.</p>
+                </div>
             </div>
-            <div class="card-body p-4">
+
+            <!-- Partea Stângă: Formularul -->
+            <div class="col-md-6 p-4 p-md-5 bg-white">
+
+                <!-- BUTONUL NOU DE ÎNTOARCERE -->
+                <a asp-page="/Index" class="text-decoration-none text-muted small fw-bold d-inline-block mb-4 transition-hover-text">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Înapoi acasă
+                </a>
+
+                <div class="text-center mb-5">
+                    <h3 class="fw-bolder text-dark">Creare Cont Nou</h3>
+                    <p class="text-muted">Alătură-te flotei AngelAirlines</p>
+                </div>
+
                 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center fw-bold" role="alert"></div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.UserName" class="form-control" placeholder="Alege un nume de utilizator" />
-                        <label asp-for="Input.UserName"><i class="fa-solid fa-at me-2"></i>Nume Utilizator</label>
-                        <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.UserName" class="form-control border-2 rounded-3" placeholder="Alege un nume de utilizator" />
+                        <label asp-for="Input.UserName" class="text-muted"><i class="fa-solid fa-at me-2"></i>Nume Utilizator</label>
+                        <span asp-validation-for="Input.UserName" class="text-danger small fw-bold"></span>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
-                        <label asp-for="Input.Email">Adresă Email</label>
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.Email" class="form-control border-2 rounded-3" autocomplete="username" placeholder="name@example.com" />
+                        <label asp-for="Input.Email" class="text-muted"><i class="fa-regular fa-envelope me-2"></i>Adresă Email</label>
+                        <span asp-validation-for="Input.Email" class="text-danger small fw-bold"></span>
                     </div>
 
-                    <div class="row">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="password" />
-                                <label asp-for="Input.Password">Parolă</label>
-                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            <div class="form-floating">
+                                <input asp-for="Input.Password" class="form-control border-2 rounded-3" autocomplete="new-password" placeholder="password" />
+                                <label asp-for="Input.Password" class="text-muted"><i class="fa-solid fa-lock me-2"></i>Parolă</label>
+                                <span asp-validation-for="Input.Password" class="text-danger small fw-bold"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="password" />
-                                <label asp-for="Input.ConfirmPassword">Confirmă Parola</label>
-                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            <div class="form-floating">
+                                <input asp-for="Input.ConfirmPassword" class="form-control border-2 rounded-3" autocomplete="new-password" placeholder="password" />
+                                <label asp-for="Input.ConfirmPassword" class="text-muted"><i class="fa-solid fa-shield-check me-2"></i>Confirmă</label>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small fw-bold"></span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-grid mt-3">
-                        <button id="registerSubmit" type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
-                            Finalizează Înregistrarea
-                        </button>
+                    <button id="login-submit" type="submit" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm mb-4 transition-hover">
+                        <i class="fa-solid fa-user-plus me-2"></i> Finalizează Înregistrarea
+                    </button>
+
+                    <div class="text-center border-top pt-4">
+                        <p class="text-muted small mb-0">Ai deja un cont?</p>
+                        <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-outline-secondary rounded-pill px-4 mt-2 fw-bold">
+                            Mergi la Autentificare
+                        </a>
                     </div>
                 </form>
             </div>
-            <div class="card-footer bg-light text-center py-3">
-                <p class="mb-0 small">Ai deja un cont? <a asp-page="./Login" class="text-success fw-bold">Autentifică-te</a></p>
-            </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .transition-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .transition-hover:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            }
+
+        .transition-hover-text:hover {
+            color: #198754 !important;
+        }
+
+        header, footer {
+            display: none !important;
+        }
+    </style>
 }

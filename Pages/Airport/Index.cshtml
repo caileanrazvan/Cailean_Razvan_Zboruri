@@ -32,27 +32,41 @@
                 <tbody>
                     @foreach (var item in Model.Airport)
                     {
-                        <tr>
+                        <tr class="@(!item.IsActive ? "bg-light opacity-75" : "")">
                             <td class="ps-4">
-                                <span class="badge bg-primary px-3 py-2 fs-6 shadow-sm">@item.IataCode</span>
+                                <span class="badge @(item.IsActive ? "bg-primary" : "bg-secondary") px-3 py-2 fs-6 shadow-sm">@item.IataCode</span>
                             </td>
                             <td>
-                                <div class="fw-bold text-dark">@item.Name</div>
+                                <div class="fw-bold text-dark">
+                                    @item.Name
+                                    @if (!item.IsActive)
+                                    {
+                                        <span class="badge bg-secondary ms-2"><i class="fa-solid fa-lock me-1"></i>ÎNCHIS</span>
+                                    }
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <i class="fa-solid fa-location-dot text-danger me-2"></i>
+                                    <i class="fa-solid fa-location-dot @(item.IsActive ? "text-danger" : "text-secondary") me-2"></i>
                                     <span>@item.City, @item.Country</span>
                                 </div>
                             </td>
                             <td class="pe-4 text-end">
                                 @if (User.IsInRole("Admin"))
                                 {
-                                    <div class="btn-group">
-                                        <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-warning rounded-start-pill px-3">
+                                    <div class="d-flex justify-content-end align-items-center gap-1">
+                                        @if (item.IsActive)
+                                        {
+                                            <form method="post" asp-page-handler="Cancel" asp-route-id="@item.ID" class="m-0">
+                                                <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm" onclick="return confirm('Dacă închizi acest aeroport, TOATE zborurile și rezervările aferente vor fi anulate automat! Continuăm?');" title="Suspendă Aeroport">
+                                                    <i class="fa-solid fa-power-off me-1"></i> Suspendă
+                                                </button>
+                                            </form>
+                                        }
+                                        <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Editează">
                                             <i class="fa-solid fa-pen"></i>
                                         </a>
-                                        <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger rounded-end-pill px-3">
+                                        <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Șterge Definitiv">
                                             <i class="fa-solid fa-trash"></i>
                                         </a>
                                     </div>

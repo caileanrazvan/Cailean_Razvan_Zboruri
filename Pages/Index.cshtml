@@ -14,7 +14,7 @@
             <h1 class="display-3 fw-bold mb-0 text-shadow-elegant">Angel Airlines</h1>
         </div>
 
-        <p class="lead fs-4 mb-0 text-shadow-elegant">Descoperă destinații divine la prețuri pământești.</p>
+        <p class="lead fs-4 mb-0 text-shadow-elegant">Descoperă destinații divine la înălțimea așteptărilor tale</p>
     </div>
 </div>
 
@@ -29,26 +29,26 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
             <h5 class="text-primary fw-bold mb-4 border-bottom pb-2">
-                <i class="fa-solid fa-plane-up"></i> Rezervă Zborul Tău
+                <i class="fa-solid fa-plane-up"></i> Unde vrei să explorezi astăzi?
             </h5>
             <form action="/Flight/Index" method="get">
                 <div class="row g-3">
                     <div class="col-md-6 col-lg-3">
-                        <label class="form-label fw-bold small text-uppercase text-muted">Plecare</label>
+                        <label class="form-label fw-bold small text-uppercase text-muted">De la</label>
                         <select name="departureId" class="form-select border-primary-subtle" asp-items="Model.AirportsList">
                             <option value="">Oriunde</option>
                         </select>
                     </div>
 
                     <div class="col-md-6 col-lg-3">
-                        <label class="form-label fw-bold small text-uppercase text-muted">Destinație</label>
+                        <label class="form-label fw-bold small text-uppercase text-muted">La</label>
                         <select name="arrivalId" class="form-select border-primary-subtle" asp-items="Model.AirportsList">
                             <option value="">Oriunde</option>
                         </select>
                     </div>
 
                     <div class="col-md-6 col-lg-3">
-                        <label class="form-label fw-bold small text-uppercase text-muted">Dată Plecare</label>
+                        <label class="form-label fw-bold small text-uppercase text-muted">Data Plecării</label>
                         <input type="date" name="flightDate" class="form-control border-primary-subtle" />
                     </div>
 
@@ -69,7 +69,7 @@
 </div>
 
 <div class="container mt-5 pt-4 mb-5">
-    <h3 class="text-center fw-bold mb-4 text-primary">Cele mai mici tarife AngelAirlines</h3>
+    <h3 class="text-center fw-bold mb-4 text-primary">Ofertele noastre</h3>
     <div class="row g-4">
         @foreach (var flight in Model.CheapFlights)
         {
@@ -122,7 +122,7 @@
 
 <div class="bg-light mt-5 py-5 border-top border-bottom">
     <div class="container">
-        <h3 class="text-center fw-bold mb-5">Personalizează-ți călătoria</h3>
+        <h3 class="text-center fw-bold mb-5">Serviciile noastre</h3>
         <div class="row g-4">
             @foreach (var amenity in Model.Amenities)
             {

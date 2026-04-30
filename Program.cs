@@ -70,5 +70,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 // ------------------------------------------------------------------
+// Inițializare Stripe folosind cheia secretă din appsettings.json
+Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["SecretKey"];
 
 app.Run();

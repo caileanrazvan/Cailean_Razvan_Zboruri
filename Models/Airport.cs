@@ -18,6 +18,7 @@ namespace Cailean_Razvan_Zboruri.Models
 
         public string Country { get; set; }
         public string Name { get; set; }
+        public bool IsActive { get; set; } = true;
 
         [InverseProperty("DepartureAirport")]
         public ICollection<Flight>? Departures { get; set; }

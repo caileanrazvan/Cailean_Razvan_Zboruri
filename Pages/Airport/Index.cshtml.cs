@@ -27,5 +27,32 @@ namespace Cailean_Razvan_Zboruri.Pages.Airport
         {
             Airport = await _context.Airport.ToListAsync();
         }
+        public async Task<IActionResult> OnPostCancelAsync(int id)
+        {
+            var airport = await _context.Airport.FindAsync(id);
+            if (airport != null)
+            {
+                // 1. Facem aeroportul inactiv
+                airport.IsActive = false;
+
+                // 2. Anulăm toate zborurile legate de el
+                var flights = await _context.Flight
+                    .Where(f => f.DepartureAirportID == id || f.ArrivalAirportID == id)
+                    .ToListAsync();
+
+                var flightIds = flights.Select(f => f.ID).ToList();
+                foreach (var f in flights) f.IsCancelled = true;
+
+                // 3. Anulăm rezervările acelor zboruri
+                var bookings = await _context.Booking
+                    .Where(b => b.FlightID.HasValue && flightIds.Contains(b.FlightID.Value))
+                    .ToListAsync();
+
+                foreach (var b in bookings) b.PaymentStatus = "Anulat";
+
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage("./Index");
+        }
     }
 }

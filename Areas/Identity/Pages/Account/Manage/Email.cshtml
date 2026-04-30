@@ -6,7 +6,8 @@
 }
 
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-info text-white">
+    <!-- Am schimbat bg-info în bg-primary -->
+    <div class="card-header bg-primary text-white">
         <h5 class="mb-0"><i class="fa-solid fa-envelope-circle-check"></i> Securitate Email</h5>
     </div>
     <div class="card-body p-4">
@@ -31,7 +32,8 @@
                 <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
             </div>
 
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-info text-white fw-bold px-4 shadow-sm">
+            <!-- Am schimbat btn-info în btn-primary și am lăsat restul la fel ca în Index -->
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-primary fw-bold px-4 shadow-sm">
                 Actualizează Email
             </button>
         </form>

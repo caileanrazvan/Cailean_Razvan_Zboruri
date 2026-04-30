@@ -1,161 +1,250 @@
 ﻿@page
 @model Cailean_Razvan_Zboruri.Pages.Booking.PaymentModel
 @{
-    ViewData["Title"] = "Securizare Plată";
+    ViewData["Title"] = "Finalizare Plată";
 }
 
 <div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
 
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="bg-primary text-white p-4 text-center">
-                    <i class="fa-solid fa-lock fs-1 mb-2 text-warning"></i>
-                    <h3 class="fw-bold mb-0">Plată Securizată</h3>
-                    <p class="text-white-50 small mb-0">Zbor @Model.CurrentBooking.Flight.DepartureAirport.IataCode <i class="fa-solid fa-arrow-right mx-1"></i> @Model.CurrentBooking.Flight.ArrivalAirport.IataCode</p>
+    <div class="mb-4">
+        <a asp-page="./Index" class="text-decoration-none text-muted fw-bold transition-hover-text">
+            <i class="fa-solid fa-arrow-left me-2"></i>Înapoi la Rezervări
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+
+                <!-- OVERLAY PENTRU ANIMAȚIA DE PROCESARE (Glassmorphism) -->
+                <div id="processingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+                     style="z-index: 100; display: none !important; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px);">
+                    <div class="spinner-grow text-primary mb-3" style="width: 4rem; height: 4rem;" role="status"></div>
+                    <h3 class="fw-bolder text-dark processing-text">Securizăm plata...</h3>
+                    <p class="text-muted fw-bold">Te rugăm să nu închizi fereastra.</p>
                 </div>
 
-                <div class="card-body p-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                        <span class="fs-5 text-muted">Total de plată:</span>
-                        <span class="fs-2 fw-bolder text-dark">@Model.TotalAmount €</span>
+                <div class="row g-0">
+
+                    <!-- PARTEA STÂNGĂ: Chitanța Premium (Dark Mode) -->
+                    <div class="col-lg-5 p-4 p-md-5 d-flex flex-column justify-content-between position-relative"
+                         style="background: linear-gradient(145deg, #141E30 0%, #243B55 100%); color: #fff;">
+
+                        <!-- Element de design (cerc în colț) -->
+                        <div class="position-absolute top-0 end-0 p-4 opacity-25">
+                            <i class="fa-brands fa-stripe display-1"></i>
+                        </div>
+
+                        <div class="position-relative z-1">
+                            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-bold">
+                                Zbor #@Model.Booking.Flight.FlightNumber
+                            </span>
+                            <h2 class="fw-bolder mb-4">Rezumatul Călătoriei</h2>
+
+                            <!-- Biletul -->
+                            <div class="bg-white bg-opacity-10 rounded-4 p-4 mb-4 border border-white border-opacity-25">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="text-center">
+                                        <h2 class="fw-bold mb-0 text-white">@Model.Booking.Flight.DepartureAirport.IataCode</h2>
+                                        <small class="text-white-50">@Model.Booking.Flight.DepartureAirport.City</small>
+                                    </div>
+                                    <div class="px-3 text-center w-100 position-relative">
+                                        <div class="border-top border-white border-opacity-25 position-absolute top-50 start-0 w-100"></div>
+                                        <i class="fa-solid fa-plane text-white position-relative bg-transparent px-2 fs-5" style="transform: translateY(-50%);"></i>
+                                    </div>
+                                    <div class="text-center">
+                                        <h2 class="fw-bold mb-0 text-white">@Model.Booking.Flight.ArrivalAirport.IataCode</h2>
+                                        <small class="text-white-50">@Model.Booking.Flight.ArrivalAirport.City</small>
+                                    </div>
+                                </div>
+                                <div class="text-center text-white-50 small fw-bold mt-2 pt-2 border-top border-white border-opacity-10">
+                                    <i class="fa-regular fa-calendar-check me-1"></i> @Model.Booking.Flight.DepartureTime.ToString("dd MMMM yyyy - HH:mm")
+                                </div>
+                            </div>
+
+                            <!-- Detalii Preț -->
+                            <div class="d-flex justify-content-between align-items-center mb-2 small text-white-50 fw-bold">
+                                <span>Preț bază per pasager</span>
+                                <span>@Model.Booking.Flight.BasePrice.ToString("N0") €</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-4 small text-white-50 fw-bold">
+                                <span>Număr pasageri</span>
+                                <span>× @Model.Booking.Passengers.Count</span>
+                            </div>
+                        </div>
+
+                        <!-- Totalul de plată -->
+                        <div class="mt-4 pt-4 position-relative z-1" style="border-top: 2px dashed rgba(255,255,255,0.2);">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div>
+                                    <span class="d-block text-white-50 fw-bold text-uppercase" style="font-size: 0.8rem;">Total de achitat</span>
+                                </div>
+                                <h1 class="fw-bolder mb-0 text-warning">@Model.TotalAmount.ToString("N0") €</h1>
+                            </div>
+                        </div>
                     </div>
 
-                    <form method="post" id="paymentForm">
-                        <input type="hidden" name="bookingId" value="@Model.CurrentBooking.ID" />
-
-                        <div class="mb-3">
-                            <label class="form-label text-muted small fw-bold text-uppercase">Nume pe card</label>
-                            <input type="text" class="form-control form-control-lg bg-light" placeholder="Numele exact ca pe card" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label text-muted small fw-bold text-uppercase">Număr Card</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-brands fa-cc-visa text-primary fs-4"></i></span>
-                                <input type="text" id="cardNumber" class="form-control form-control-lg bg-light" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                    <!-- PARTEA DREAPTĂ: Formularul Stripe -->
+                    <div class="col-lg-7 p-4 p-md-5 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                            <h3 class="fw-bold text-dark mb-0">Detalii Plată</h3>
+                            <div class="text-muted d-flex gap-2 fs-4">
+                                <i class="fa-brands fa-cc-visa text-primary"></i>
+                                <i class="fa-brands fa-cc-mastercard text-danger"></i>
+                                <i class="fa-brands fa-cc-amex text-info"></i>
                             </div>
                         </div>
 
-                        <div class="row mb-4">
-                            <div class="col-6">
-                                <label class="form-label text-muted small fw-bold text-uppercase">Expirare</label>
-                                <input type="text" id="expDate" class="form-control form-control-lg bg-light" placeholder="LL/AA" maxlength="5" required>
+                        <form id="paymentForm" method="post">
+                            <input type="hidden" name="bookingId" value="@Model.Booking.ID" />
+                            <input type="hidden" name="paymentIntentId" id="paymentIntentId" />
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Informații Contact</label>
+                                <div class="input-group border-2 rounded-3 overflow-hidden bg-light">
+                                    <span class="input-group-text bg-transparent border-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" class="form-control border-0 bg-transparent shadow-none" value="@Model.Booking.ContactEmail" readonly>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label text-muted small fw-bold text-uppercase">Cod CVC</label>
-                                <input type="password" id="cvv" class="form-control form-control-lg bg-light" placeholder="***" maxlength="3" required>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted">Nume Titular Card</label>
+                                <div class="input-group border border-2 rounded-3 focus-ring-group transition">
+                                    <span class="input-group-text bg-white border-0 text-muted"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" id="card-name" class="form-control border-0 shadow-none py-2" placeholder="Numele exact de pe card" required>
+                                </div>
                             </div>
-                        </div>
 
-                        <button type="submit" id="payButton" class="btn btn-warning btn-lg w-100 fw-bold shadow text-uppercase rounded-pill">
-                            Plătește @Model.TotalAmount €
-                        </button>
+                            <div class="mb-5">
+                                <label class="form-label small fw-bold text-muted">Informații Card Bancar</label>
+                                <!-- DIV-ul magic pentru Stripe -->
+                                <div id="card-element" class="form-control border border-2 rounded-3 p-3 focus-ring-group transition bg-white"></div>
+                                <div id="card-errors" role="alert" class="text-danger small fw-bold mt-2"></div>
+                            </div>
 
-                        <button class="btn btn-warning btn-lg w-100 fw-bold shadow text-uppercase rounded-pill d-none" id="loadingButton" type="button" disabled>
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            Se procesează plata...
-                        </button>
-                    </form>
+                            <button type="submit" id="payButton" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow mb-3 pay-btn">
+                                <span class="d-flex justify-content-between align-items-center px-2">
+                                    <span>Plătește Acum</span>
+                                    <span class="fs-5">@Model.TotalAmount.ToString("N0") €</span>
+                                </span>
+                            </button>
 
-                    <div class="text-center mt-4">
-                        <i class="fa-brands fa-cc-stripe fs-2 text-muted opacity-50 me-2"></i>
-                        <i class="fa-brands fa-cc-mastercard fs-2 text-muted opacity-50"></i>
-                        <p class="small text-muted mt-2">Toate tranzacțiile sunt criptate folosind standardul SSL 256-bit.</p>
+                            <div class="text-center text-muted small fw-bold d-flex justify-content-center align-items-center gap-2">
+                                <i class="fa-solid fa-lock text-success"></i> Plată securizată și criptată
+                            </div>
+                        </form>
                     </div>
+
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
-<script>
-    // 1. FORMATĂM NUMĂRUL CARDULUI (Spațiu la fiecare 4 cifre, max 16 cifre reale)
-    const cardNumberInput = document.getElementById('cardNumber');
-    cardNumberInput.addEventListener('input', function (e) {
-        // Păstrăm doar cifrele
-        let value = e.target.value.replace(/\D/g, '');
+@section Scripts {
+    <!-- Biblioteca Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
 
-        // Limităm la 16 cifre strict
-        if (value.length > 16) {
-            value = value.slice(0, 16);
-        }
+    <script>
+        var stripe = Stripe('@Model.StripePublishableKey');
+        var elements = stripe.elements();
 
-        // Adăugăm un spațiu la fiecare 4 cifre pentru vizualizare (Ex: 1234 5678)
-        e.target.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-    });
+        // Stilizare mai luxoasă a cardului Stripe
+        var style = {
+            base: {
+                color: '#212529',
+                fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                iconColor: '#0052D4',
+                '::placeholder': { color: '#adb5bd' }
+            },
+            invalid: { color: '#dc3545', iconColor: '#dc3545' }
+        };
 
-    // 2. FORMATĂM DATA DE EXPIRARE (Format LL/AA)
-    const expDateInput = document.getElementById('expDate');
-    expDateInput.addEventListener('input', function (e) {
-        // Păstrăm doar cifrele
-        let value = e.target.value.replace(/\D/g, '');
+        var card = elements.create('card', { style: style, hidePostalCode: true });
+        card.mount('#card-element');
 
-        if (value.length > 4) {
-            value = value.slice(0, 4);
-        }
+        // Gestionarea erorilor live
+        card.on('change', function(event) {
+            var displayError = document.getElementById('card-errors');
+            var cardContainer = document.getElementById('card-element');
 
-        // Dacă avem cel puțin luna introdusă
-        if (value.length >= 2) {
-            let month = parseInt(value.slice(0, 2));
-
-            // Nu există lună mai mare de 12 sau luna 00
-            if (month > 12) month = 12;
-            if (month === 0) month = '01';
-
-            let formattedMonth = month.toString().padStart(2, '0');
-
-            // Punem slash-ul automat dacă utilizatorul a trecut de primele 2 cifre
-            if (value.length > 2) {
-                e.target.value = formattedMonth + '/' + value.slice(2);
+            if (event.error) {
+                displayError.textContent = event.error.message;
+                cardContainer.classList.add('border-danger');
             } else {
-                // Previne adăugarea slash-ului când dai Delete/Backspace
-                e.target.value = formattedMonth + (e.inputType === 'deleteContentBackward' ? '' : '/');
+                displayError.textContent = '';
+                cardContainer.classList.remove('border-danger');
             }
-        } else {
-            e.target.value = value;
+        });
+
+        // Interceptarea butonului de plată
+        var form = document.getElementById('paymentForm');
+
+        form.addEventListener('submit', function(ev) {
+            ev.preventDefault();
+
+            // Afișăm loading-ul
+            document.getElementById('processingOverlay').style.setProperty('display', 'flex', 'important');
+            document.getElementById('payButton').disabled = true;
+
+            // Trimitem plata către Stripe
+            stripe.confirmCardPayment('@Model.ClientSecret', {
+                payment_method: {
+                    card: card,
+                    billing_details: { name: document.getElementById('card-name').value }
+                }
+            }).then(function(result) {
+                if (result.error) {
+                    // Ceva nu a mers bine (ex: fonduri insuficiente)
+                    document.getElementById('card-errors').textContent = result.error.message;
+                    document.getElementById('processingOverlay').style.setProperty('display', 'none', 'important');
+                    document.getElementById('payButton').disabled = false;
+                } else {
+                    // SUCCES!
+                    if (result.paymentIntent.status === 'succeeded') {
+                        // Punem ID-ul tranzacției reale în formular
+                        document.getElementById('paymentIntentId').value = result.paymentIntent.id;
+
+                        // Trimitem formularul instant către backend-ul tău
+                        form.submit();
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .transition {
+            transition: all 0.3s ease;
         }
-    });
 
-    // 3. FORMATĂM CVV-UL (Doar cifre, strict 3)
-    const cvvInput = document.getElementById('cvv');
-    cvvInput.addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\D/g, ''); // Doar cifre
-        if (value.length > 3) {
-            value = value.slice(0, 3);
-        }
-        e.target.value = value;
-    });
-
-    // 4. VALIDARE FINALĂ ÎNAINTE DE PLATĂ ȘI SPINNER
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
-
-        // Verificăm lungimea reală (fără spații și slash-uri)
-        const rawCard = cardNumberInput.value.replace(/\D/g, '');
-        const rawExp = expDateInput.value.replace(/\D/g, '');
-        const rawCvv = cvvInput.value.replace(/\D/g, '');
-
-        if (rawCard.length !== 16) {
-            e.preventDefault();
-            alert('Numărul cardului trebuie să conțină exact 16 cifre!');
-            return;
+        .transition-hover-text:hover {
+            color: #0052D4 !important;
         }
 
-        if (rawExp.length !== 4) {
-            e.preventDefault();
-            alert('Data expirării trebuie să fie completă (LL/AA)!');
-            return;
+        /* Efecte pentru inputuri */
+        .focus-ring-group:focus-within {
+            border-color: #0052D4 !important;
+            box-shadow: 0 0 0 0.25rem rgba(0, 82, 212, 0.1);
         }
 
-        if (rawCvv.length !== 3) {
-            e.preventDefault();
-            alert('Codul CVC trebuie să conțină exact 3 cifre!');
-            return;
+        /* Butonul de plată */
+        .pay-btn {
+            background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%);
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        // Dacă a trecut toate testele de securitate, ascundem butonul și arătăm Spinner-ul
-        document.getElementById('payButton').classList.add('d-none');
-        document.getElementById('loadingButton').classList.remove('d-none');
-    });
-</script>
+            .pay-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 .5rem 1rem rgba(0, 82, 212, 0.3) !important;
+            }
+
+        /* Stripe iframe padding fix */
+        .StripeElement {
+            padding: 5px 0;
+        }
+    </style>
+}
