@@ -101,6 +101,35 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (booking.UserId != userId && !User.IsInRole("Admin")) return Forbid();
 
+            // SECURITATE CONCURENȚĂ: Verificăm dacă noile locuri alese sunt încă libere
+            var requestedSeats = PassengersData.Select(p => p.SeatNumber).ToList();
+
+            var currentOccupiedSeats = await _context.Booking
+                .Where(b => b.FlightID == booking.FlightID && b.ID != bookingId) // Excludem rezervarea curentă
+                .SelectMany(b => b.Passengers)
+                .Where(p => p.SeatNumber != null)
+                .Select(p => p.SeatNumber!)
+                .ToListAsync();
+
+            var alreadyTakenSeats = requestedSeats.Intersect(currentOccupiedSeats).ToList();
+
+            if (alreadyTakenSeats.Any())
+            {
+                // Un loc a fost furat între timp. Ne oprim, dăm eroare și reîncărcăm pagina.
+                ModelState.AddModelError(string.Empty, $"Atenție! Locurile {string.Join(", ", alreadyTakenSeats)} au fost ocupate de altcineva în ultimele minute. Vă rugăm să alegeți alte locuri de pe hartă.");
+
+                // Reîncărcăm datele necesare pentru Get
+                OccupiedSeats = currentOccupiedSeats;
+                AvailableAmenities = await _context.Amenity.ToListAsync();
+                Booking = await _context.Booking
+                        .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
+                        .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
+                        .FirstOrDefaultAsync(b => b.ID == bookingId);
+
+                return Page();
+            }
+
+            // Totul este valid. Salvăm noile date și emitem biletul.
             var availableAmenities = await _context.Amenity.ToListAsync();
 
             foreach (var input in PassengersData)
@@ -114,7 +143,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
                     passengerToUpdate.LastName = input.LastName;
                     passengerToUpdate.DateOfBirth = input.DateOfBirth;
                     passengerToUpdate.PassportNumber = input.PassportNumber;
-                    passengerToUpdate.SeatNumber = input.SeatNumber;
+                    passengerToUpdate.SeatNumber = input.SeatNumber; // Acum este 100% sigur
 
                     passengerToUpdate.Amenities.Clear();
                     if (input.SelectedAmenitiesIds != null && input.SelectedAmenitiesIds.Any())

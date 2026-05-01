@@ -22,56 +22,21 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             _context = context;
         }
 
-        // Proprietăți pentru a afișa datele pe pagină
         public Models.Flight SelectedFlight { get; set; }
         public IList<Models.Amenity> AvailableAmenities { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public int PassengersCount { get; set; } = 1;
 
-        // Modelul pe care îl vom salva în baza de date
         [BindProperty]
         public Models.Booking Booking { get; set; } = default!;
 
-        // Array pentru a prinde ID-urile serviciilor bifate de utilizator
         [BindProperty]
         public int[] SelectedAmenities { get; set; }
         public List<string> OccupiedSeats { get; set; } = new List<string>();
 
-        public async Task<IActionResult> OnGetAsync(int? flightId, int passengers = 1)
-        {
-            if (flightId == null)
-            {
-                return RedirectToPage("/Flights/Index"); // Dacă nu are zbor, îl trimitem înapoi
-            }
-
-            // Aducem zborul selectat cu tot cu aeroporturi
-            SelectedFlight = await _context.Flight
-                .Include(f => f.DepartureAirport)
-                .Include(f => f.ArrivalAirport)
-                .FirstOrDefaultAsync(m => m.ID == flightId);
-
-            if (SelectedFlight == null)
-            {
-                return NotFound();
-            }
-
-            PassengersCount = passengers;
-            AvailableAmenities = await _context.Amenity.ToListAsync();
-
-            // Extragem toate locurile deja rezervate pentru acest zbor
-            OccupiedSeats = await _context.Booking
-                .Where(b => b.FlightID == flightId)
-                .SelectMany(b => b.Passengers)
-                .Where(p => p.SeatNumber != null)
-                .Select(p => p.SeatNumber!)
-                .ToListAsync();
-
-            return Page();
-        }
-
         [BindProperty]
-        public List<Passenger> PassengerInputs { get; set; } // Aceasta va prinde datele din formular
+        public List<Passenger> PassengerInputs { get; set; }
 
         [BindProperty]
         public string ContactEmail { get; set; }
@@ -79,22 +44,63 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
         [BindProperty]
         public string ContactPhone { get; set; }
 
+        public async Task<IActionResult> OnGetAsync(int? flightId, int passengers = 1)
+        {
+            if (flightId == null) return RedirectToPage("/Flight/Index");
+
+            await LoadPageDataAsync(flightId.Value);
+
+            if (SelectedFlight == null) return NotFound();
+
+            PassengersCount = passengers;
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
+            // 1. SECURITATE: Verificăm dacă zborul trimis din formular chiar există
+            var flightExists = await _context.Flight.AnyAsync(f => f.ID == Booking.FlightID);
+            if (!flightExists) return NotFound();
+
+            // 2. CONCURENȚĂ: Verificăm din nou în TIMP REAL dacă locurile selectate sunt încă libere
+            var currentOccupiedSeats = await _context.Booking
+                .Where(b => b.FlightID == Booking.FlightID)
+                .SelectMany(b => b.Passengers)
+                .Where(p => p.SeatNumber != null)
+                .Select(p => p.SeatNumber)
+                .ToListAsync();
+
+            var requestedSeats = PassengerInputs.Select(p => p.SeatNumber).ToList();
+
+            // Intersectăm listele. Dacă există elemente comune, înseamnă că locul e deja luat!
+            var alreadyTakenSeats = requestedSeats.Intersect(currentOccupiedSeats).ToList();
+
+            if (alreadyTakenSeats.Any())
+            {
+                // Unul dintre locuri a fost luat între timp! Oprim tot și anunțăm utilizatorul.
+                ModelState.AddModelError(string.Empty, $"Ne pare rău, dar locurile următoare tocmai au fost rezervate de altcineva: {string.Join(", ", alreadyTakenSeats)}. Vă rugăm să alegeți alte locuri.");
+
+                // Reîncărcăm datele pentru ca pagina să se afișeze corect cu noile scaune ocupate
+                await LoadPageDataAsync(Booking.FlightID.Value);
+                return Page();
+            }
+
+            // 3. Dacă totul este valid și locurile sunt libere, creăm rezervarea
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // 1. Creăm obiectul principal de rezervare
             var newBooking = new Models.Booking
             {
                 FlightID = Booking.FlightID,
                 ContactEmail = ContactEmail,
                 ContactPhone = ContactPhone,
                 BookingDate = DateTime.Now,
-                UserId = userId, // Salvăm cine a făcut rezervarea
+                UserId = userId,
                 PaymentStatus = "Pending"
             };
 
-            // 2. Adăugăm fiecare pasager din formular în lista rezervării
+            // Preîncărcăm serviciile disponibile pentru a fi mai rapizi
+            var availableAmenities = await _context.Amenity.ToListAsync();
+
             foreach (var p in PassengerInputs)
             {
                 var newPassenger = new Passenger
@@ -103,18 +109,15 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
                     FirstName = p.FirstName,
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
-                    SeatNumber = p.SeatNumber, // Salvăm locul din formular
+                    SeatNumber = p.SeatNumber,
                     Email = (newBooking.Passengers.Count == 0) ? ContactEmail : null
                 };
 
-                // NOU: Căutăm serviciile bifate de ACEST pasager și le adăugăm la profilul lui
                 if (p.SelectedAmenitiesIds != null && p.SelectedAmenitiesIds.Any())
                 {
-                    var selectedAmenities = await _context.Amenity
+                    newPassenger.Amenities = availableAmenities
                         .Where(a => p.SelectedAmenitiesIds.Contains(a.ID))
-                        .ToListAsync();
-
-                    newPassenger.Amenities = selectedAmenities;
+                        .ToList();
                 }
 
                 newBooking.Passengers.Add(newPassenger);
@@ -124,6 +127,25 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Payment", new { bookingId = newBooking.ID });
+        }
+
+        // Am scos logica de încărcare a zborului și listelor într-o metodă separată
+        // pentru a putea repopula pagina în caz de eroare (dacă locul a fost furat)
+        private async Task LoadPageDataAsync(int flightId)
+        {
+            SelectedFlight = await _context.Flight
+                .Include(f => f.DepartureAirport)
+                .Include(f => f.ArrivalAirport)
+                .FirstOrDefaultAsync(m => m.ID == flightId);
+
+            AvailableAmenities = await _context.Amenity.ToListAsync();
+
+            OccupiedSeats = await _context.Booking
+                .Where(b => b.FlightID == flightId)
+                .SelectMany(b => b.Passengers)
+                .Where(p => p.SeatNumber != null)
+                .Select(p => p.SeatNumber!)
+                .ToListAsync();
         }
     }
 }

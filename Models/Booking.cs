@@ -9,21 +9,28 @@ namespace Cailean_Razvan_Zboruri.Models
 
         [DataType(DataType.Date)]
         public DateTime BookingDate { get; set; } = DateTime.Now;
+
         public int? FlightID { get; set; }
         public Flight? Flight { get; set; }
+
         public string? UserId { get; set; }
         public IdentityUser? User { get; set; }
+
+        [Required]
+        [EmailAddress(ErrorMessage = "Adresa de email nu este validă.")]
         public string ContactEmail { get; set; }
+
+        [Required]
+        [Phone(ErrorMessage = "Numărul de telefon nu este valid.")]
         public string ContactPhone { get; set; }
-        // Statusul plății (Pending, Paid, Failed)
+
+        // Statusul plății (Pending, Paid, Anulat)
+        // (La nivel pro, se folosește un Enum, dar string-ul este ok pentru stadiul actual)
         public string PaymentStatus { get; set; } = "Pending";
 
-        // ID-ul tranzacției generat după plată
         public string? TransactionId { get; set; }
 
-        // O rezervare are mai mulți pasageri
         public ICollection<Passenger> Passengers { get; set; } = new List<Passenger>();
-
         public ICollection<BookingAmenity>? BookingAmenities { get; set; }
     }
 }

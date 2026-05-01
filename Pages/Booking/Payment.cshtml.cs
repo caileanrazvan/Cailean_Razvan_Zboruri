@@ -33,13 +33,24 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
                 .Include(b => b.Flight).ThenInclude(f => f.DepartureAirport)
                 .Include(b => b.Flight).ThenInclude(f => f.ArrivalAirport)
                 .Include(b => b.Passengers)
+                    .ThenInclude(p => p.Amenities) // NOU: Includem și serviciile extra alese de pasageri!
                 .FirstOrDefaultAsync(m => m.ID == bookingId);
 
             if (Booking == null) return NotFound();
-            if (Booking.PaymentStatus == "Paid") return RedirectToPage("./Index");
+            if (Booking.PaymentStatus == "Paid") return RedirectToPage("./BookingSummary", new { bookingId = Booking.ID });
 
+            // CALCULUL CORECT AL TOTALULUI (Bilete + Servicii Extra)
             int passengersCount = Booking.Passengers?.Count ?? 1;
-            TotalAmount = (Booking.Flight?.BasePrice ?? 0) * passengersCount;
+
+            // 1. Prețul de bază pentru toți pasagerii
+            decimal basePriceTotal = (Booking.Flight?.BasePrice ?? 0) * passengersCount;
+
+            // 2. Adunăm prețul tuturor serviciilor extra (Amenities)
+            decimal amenitiesTotal = Booking.Passengers?
+                .SelectMany(p => p.Amenities ?? new List<Models.Amenity>())
+                .Sum(a => a.Price) ?? 0;
+
+            TotalAmount = basePriceTotal + amenitiesTotal;
 
             // 1. Pregătim cheia publică pentru frontend
             StripePublishableKey = _configuration["Stripe:PublishableKey"];
@@ -47,7 +58,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             // 2. Creăm intenția de plată (Payment Intent) pe serverele Stripe
             var options = new PaymentIntentCreateOptions
             {
-                Amount = (long)(TotalAmount * 100), // Stripe cere suma în cenți (ex: 50 EUR = 5000 cenți)
+                Amount = (long)(TotalAmount * 100), // Stripe cere suma în cenți
                 Currency = "eur",
                 Metadata = new Dictionary<string, string>
                 {
@@ -56,7 +67,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
             };
 
             var service = new PaymentIntentService();
-            var intent = service.Create(options);
+            var intent = await service.CreateAsync(options);
 
             // 3. Trimitem secretul către frontend pentru a autoriza tranzacția
             ClientSecret = intent.ClientSecret;
@@ -66,9 +77,30 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
         public async Task<IActionResult> OnPostAsync(int bookingId, string paymentIntentId)
         {
-            // Când ajungem aici, Stripe a confirmat deja că banii au fost luați.
+            if (string.IsNullOrEmpty(paymentIntentId))
+            {
+                return BadRequest("Eroare de securitate: ID-ul plății lipsește.");
+            }
+
+            // SECURITATE PRO: Verificăm direct la Stripe stadiul plății!
+            var service = new PaymentIntentService();
+            var intent = await service.GetAsync(paymentIntentId);
+
+            // Dacă hackerul a simulat apelul POST, dar plata la Stripe nu este completă, îl oprim.
+            if (intent.Status != "succeeded")
+            {
+                return BadRequest("Eroare: Plata nu a fost confirmată de bancă. Vă rugăm să încercați din nou.");
+            }
+
+            // Când ajungem aici, știm 100% sigur că banii au intrat în cont.
             var bookingToUpdate = await _context.Booking.FindAsync(bookingId);
             if (bookingToUpdate == null) return NotFound();
+
+            // Ne asigurăm că nu emitem două coduri dacă din greșeală s-a făcut POST de două ori
+            if (bookingToUpdate.PaymentStatus == "Paid")
+            {
+                return RedirectToPage("./BookingSummary", new { bookingId = bookingId });
+            }
 
             bookingToUpdate.PaymentStatus = "Paid";
 
@@ -78,10 +110,7 @@ namespace Cailean_Razvan_Zboruri.Pages.Booking
 
             await _context.SaveChangesAsync();
 
-            // Redirecționăm către pagina BookingSummary și îi pasăm ID-ul rezervării
             return RedirectToPage("./BookingSummary", new { bookingId = bookingId });
-            // Notă: Dacă în pagina ta parametrul se numește altfel (ex: bookingId), 
-            // modifică mai sus în consecință: new { bookingId = bookingId }
         }
     }
 }
