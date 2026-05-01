@@ -33,7 +33,6 @@
 </div>
 
 <div class="row">
-    <!-- COLOANA FILTRE (Stânga) -->
     <div class="col-md-3 d-none d-md-block">
         <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
             <div class="card-body">
@@ -41,7 +40,6 @@
                 <hr />
                 <p class="text-muted small">Am găsit zboruri potrivite pentru criteriile tale.</p>
 
-                <!-- SELECTOR DE SORTARE -->
                 <form method="get" class="mt-4">
                     <input type="hidden" name="departureId" value="@Model.CurrentDepartureId" />
                     <input type="hidden" name="arrivalId" value="@Model.CurrentArrivalId" />
@@ -89,7 +87,6 @@
         </div>
     </div>
 
-    <!-- COLOANA REZULTATE (Dreapta) -->
     <div class="col-md-9">
         @if (Model.Flight.Count == 0)
         {
@@ -105,6 +102,10 @@
             @foreach (var item in Model.Flight)
             {
                 bool isPast = item.DepartureTime < DateTime.Now;
+
+                // --- CALCUL DURATĂ ZBOR ---
+                TimeSpan duration = item.ArrivalTime - item.DepartureTime;
+                string formattedDuration = $"{(int)duration.TotalHours}h {duration.Minutes:D2}m"; // Ex: 2h 45m
 
                 <div class="card border-0 shadow-sm mb-4 rounded-4 flight-list-card transition @(isPast || item.IsCancelled ? "border border-danger bg-danger-subtle" : "")">
 
@@ -135,7 +136,7 @@
                                     </div>
 
                                     <div class="flex-grow-1 px-4 text-center position-relative">
-                                        <div class="text-muted small fw-bold mb-1">Direct</div>
+                                        <div class="text-muted small fw-bold mb-1">Direct &bull; @formattedDuration</div>
                                         <div class="border-top border-2 border-primary-subtle position-relative">
                                             <i class="fa-solid fa-plane text-primary position-absolute top-50 start-50 translate-middle bg-white px-2"></i>
                                         </div>
@@ -216,21 +217,12 @@
                 </div>
             }
 
-            <!-- PAGINAREA -->
             @if (Model.TotalPages > 1)
-
             {
-
                 <nav aria-label="Page navigation" class="mt-5 mb-4">
-
                     <ul class="pagination justify-content-center">
 
-
-
-                        <!-- Butonul 'Anterioară' -->
-
                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-
                             <a class="page-link rounded-start-pill px-4 fw-bold shadow-sm"
                                asp-route-pageIndex="@(Model.CurrentPage - 1)"
                                asp-route-SortOrder="@Model.SortOrder"
@@ -238,22 +230,13 @@
                                asp-route-arrivalId="@Model.CurrentArrivalId"
                                asp-route-flightDate="@Model.SearchDate?.ToString("yyyy-MM-dd")"
                                asp-route-passengers="@Model.Passengers">
-
                                 <i class="fa-solid fa-chevron-left me-1"></i> Înapoi
-
                             </a>
-
                         </li>
 
-
-
-                        <!-- Numerele paginilor -->
                         @for (int i = 1; i <= Model.TotalPages; i++)
-
                         {
-
                             <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-
                                 <a class="page-link shadow-sm fw-bold"
                                    asp-route-pageIndex="@i"
                                    asp-route-SortOrder="@Model.SortOrder"
@@ -261,21 +244,12 @@
                                    asp-route-arrivalId="@Model.CurrentArrivalId"
                                    asp-route-flightDate="@Model.SearchDate?.ToString("yyyy-MM-dd")"
                                    asp-route-passengers="@Model.Passengers">
-
                                     @i
-
                                 </a>
-
                             </li>
-
                         }
 
-
-
-                        <!-- Butonul 'Următoarea' -->
-
                         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-
                             <a class="page-link rounded-end-pill px-4 fw-bold shadow-sm"
                                asp-route-pageIndex="@(Model.CurrentPage + 1)"
                                asp-route-SortOrder="@Model.SortOrder"
@@ -283,19 +257,12 @@
                                asp-route-arrivalId="@Model.CurrentArrivalId"
                                asp-route-flightDate="@Model.SearchDate?.ToString("yyyy-MM-dd")"
                                asp-route-passengers="@Model.Passengers">
-
                                 Înainte <i class="fa-solid fa-chevron-right ms-1"></i>
-
                             </a>
-
                         </li>
 
-
-
                     </ul>
-
                 </nav>
-
             }
         }
     </div>

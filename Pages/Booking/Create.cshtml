@@ -69,6 +69,13 @@
 
                                 <div class="bg-light p-3 rounded-4 border border-primary-subtle">
                                     <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Opțiuni Extra pentru Pasagerul @(i + 1)</h6>
+                                    <div class="alert alert-primary bg-primary-subtle border-0 d-flex align-items-center p-3 mb-3 rounded-3">
+                                        <i class="fa-solid fa-suitcase-rolling fs-3 text-primary me-3"></i>
+                                        <div>
+                                            <strong class="d-block text-dark">Bagaj gratuit inclus</strong>
+                                            <span class="small text-muted">Fiecare pasager beneficiază de 1 bagaj de cabină (troller) și 1 articol personal (rucsac/geantă).</span>
+                                        </div>
+                                    </div>
                                     <div class="row g-2">
                                         @foreach (var amenity in Model.AvailableAmenities)
                                         {
